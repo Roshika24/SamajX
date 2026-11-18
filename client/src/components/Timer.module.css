@@ -1,0 +1,72 @@
+/* Timer — countdown with digit boxes */
+.timer {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.segment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.digits {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  min-width: 3rem;
+  text-align: center;
+}
+
+.label {
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-ink-muted);
+}
+
+.colon {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  align-self: flex-start;
+  padding-top: var(--space-2);
+}
+
+/* Light variant (default) */
+.light .digits {
+  background: var(--color-gray-100);
+  color: var(--color-ink);
+}
+
+.light .colon {
+  color: var(--color-ink-muted);
+}
+
+/* Dark variant (on purple backgrounds) */
+.dark .digits {
+  background: rgba(255, 255, 255, 0.15);
+  color: var(--color-white);
+}
+
+.dark .colon {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.dark .label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Urgent pulse when < 1 hour */
+.urgent .digits {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}

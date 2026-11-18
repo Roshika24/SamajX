@@ -1,0 +1,44 @@
+/* Card — white rounded container */
+.card {
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  position: relative;
+}
+
+/* Padding variants */
+.pad-none { padding: 0; }
+.pad-sm   { padding: var(--space-4); }
+.pad-md   { padding: var(--space-6); }
+.pad-lg   { padding: var(--space-8); }
+
+/* Style variants */
+.elevated {
+  box-shadow: var(--shadow-xl);
+}
+
+.outlined {
+  box-shadow: none;
+  border: 1px solid var(--color-gray-200);
+}
+
+.hero {
+  background: var(--color-purple);
+  color: var(--color-white);
+}
+
+/* Diagonal yellow swoosh on hero cards via pseudo-element */
+.hero::after {
+  content: '';
+  position: absolute;
+  bottom: -20%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  background: var(--color-yellow);
+  transform: rotate(-12deg);
+  border-radius: var(--radius-xl);
+  opacity: 0.15;
+  pointer-events: none;
+}
