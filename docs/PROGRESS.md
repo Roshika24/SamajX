@@ -139,18 +139,19 @@ Known scope limits in this pass:
 - [ ] All role dashboards complete
 - [ ] Confetti celebrations (canvas-confetti)
 
-## Phase 6 — AI LAYER ✅
-- [x] LLM integration (Claude API via env vars: `AI_PROVIDER`, `ANTHROPIC_API_KEY`, `AI_MODEL`)
-- [x] Feature 1: AI-assisted problem-domain classification
-- [x] Feature 2: AI-assisted problem-difficulty prediction
-- [x] PII stripping before LLM calls (emails, phone numbers, tokens, text bounded)
-- [x] Structured JSON schema validation and taxonomy enforcement
-- [x] Asynchronous database-backed job processing (`ai_jobs` table, retry-safe with row locking)
-- [x] Platform Admin domain review API & UI (accept or override)
-- [x] University Admin difficulty review API & UI (accept or override)
-- [x] Migration `007_phase6_ai_layer.sql` added and applied
-- [x] Full regression test suite passing (69/69 tests passing)
-- [x] Client production build passing (136 modules)
+## Phase 6 — AI LAYER 🔲
+- [ ] Multilingual sentence embeddings (Transformers.js, MiniLM)
+- [ ] Semantic duplicate detection (upgrade from TF-IDF)
+- [ ] LLM integration (Claude API via env var)
+- [ ] Domain tagging (background job)
+- [ ] Difficulty suggestion with reason
+- [ ] Merged problem title/summary
+- [ ] Proposal summary for admins
+- [ ] PII stripping before LLM calls
+- [ ] Fallback to TF-IDF + rules on failure
+- [ ] ai_status tracking (pending → done/failed)
+- [ ] Evaluation script (50 labeled pairs)
+- [ ] Before/after quality comparison
 
 ## Phase 7 — POLISH & DELIVERY 🔲
 - [ ] Tests: state machines
@@ -173,7 +174,7 @@ Known scope limits in this pass:
 - Uploaded ZIP did not contain the audit harness, so the new `npm test` suite is a baseline and not yet a conversion of those 29 checks.
 
 ## Current Phase
-**Phase 5 — EXECUTION, COMPLETION, CERTIFICATES (reduced scope)** (implementation added; PostgreSQL/browser verification pending)
+**Phase 2 — UNIVERSITIES, LEADERS, TEAMS** (implementation complete; awaiting runtime verification and user approval)
 
 ## Next Up
 Complete the PostgreSQL 16 + frontend build verification for Phase 2, then wait for user approval before Phase 3.
@@ -288,19 +289,3 @@ Not verified in this environment:
 - [x] Distance remains display metadata; the existing leader problem feed labels distances above 150 km as `Far away` and does not filter them out.
 - [x] If no university matches, classification and required skills are saved but the application window stays closed; the UI explains how to complete profiles and retry.
 - [ ] Migration 005, live PostgreSQL routing checks and browser workflow remain to be run in the user's local environment.
-
-## Phase 5 reduced-scope implementation — 2026-11-18
-
-Included scope (per user decision):
-- [x] Leader project workspace with milestone posting and proof links.
-- [x] Final report and HTTPS proof submission for university review.
-- [x] University-scoped completion review with approve/reopen decisions.
-- [x] Certificate issuance for every team member after university approval.
-- [x] Public certificate verification and PDF download.
-- [x] Additive migration `006_phase5_completion_certificates.sql`.
-- [x] Node.js/Express project routes and React role workspaces.
-- [ ] Runtime PostgreSQL migration/integration verification on the user's database.
-- [ ] Full Windows `npm ci`, repeated test runs and production Vite build.
-- [ ] Browser-based end-to-end test with real leader/university accounts.
-
-Explicitly deferred by user: sponsorship pledges, company project gallery, email notifications and dashboard redesigns.

@@ -5,7 +5,6 @@ const config = require('../../config');
 const { ValidationError, NotFoundError, ForbiddenError } = require('../../lib/errors');
 const { cosineSimilarity, mergeBand } = require('./similarity');
 const { routeProblem } = require('./problemRouting');
-const { enqueueProblemAIJobs, triggerAIWorker } = require('../ai/ai.worker');
 
 const OPEN_STATUSES = ['reported', 'open_for_applications', 'window_closed', 'pending_approval', 'claimed', 'in_progress', 'reopened', 'unrouted'];
 const CATEGORY_ALIASES = {
@@ -116,7 +115,6 @@ async function createReport(userId, input) {
       });
       routing = await routeProblem(client, problem.id);
       reportProblemId = problem.id;
-      await enqueueProblemAIJobs(problem.id, client);
     }
 
     const reportStatus = best && band === 'high' ? 'merged' : 'active';
@@ -136,9 +134,6 @@ async function createReport(userId, input) {
       );
     }
     await client.query('COMMIT');
-    if (problem) {
-      triggerAIWorker();
-    }
     return {
       report,
       duplicate: best ? { band, confidence: Number(best.score.toFixed(3)), candidate: { id: best.id, title: best.title } } : null,
@@ -203,14 +198,10 @@ async function resolveCandidate(userId, reportId, confirm) {
         recurrenceOf: confirm ? row.candidate_problem_id : null,
       });
       routing = await routeProblem(client, problem.id);
-      await enqueueProblemAIJobs(problem.id, client);
       await client.query('UPDATE reports SET problem_id = $2, merge_confidence = NULL WHERE id = $1', [reportId, problem.id]);
       await client.query("UPDATE report_merge_candidates SET status = 'rejected', resolved_at = NOW() WHERE report_id = $1", [reportId]);
     }
     await client.query('COMMIT');
-    if (problem) {
-      triggerAIWorker();
-    }
     return { reportId: Number(reportId), duplicateConfirmed: Boolean(confirm && canStillMerge), routing };
   } catch (err) {
     await client.query('ROLLBACK').catch(() => {});

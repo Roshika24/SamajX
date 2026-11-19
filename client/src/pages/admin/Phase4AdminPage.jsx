@@ -1,8 +1,8 @@
+
 import { useEffect, useState } from 'react';
 import { api } from '../../utils/api';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
-import Badge from '../../components/Badge';
 
 const TYPES = [
   'survey',
@@ -16,22 +16,19 @@ const TYPES = [
 export default function Phase4AdminPage() {
   const [problems, setProblems] = useState([]);
   const [apps, setApps] = useState([]);
-  const [domains, setDomains] = useState([]);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [busy, setBusy] = useState({});
 
   async function load() {
     try {
-      const [p, a, d] = await Promise.all([
+      const [p, a] = await Promise.all([
         api.get('/admin/phase4/problems'),
-        api.get('/admin/phase4/applications'),
-        api.get('/domains')
+        api.get('/admin/phase4/applications')
       ]);
 
       setProblems(p.data || []);
       setApps(a.data || []);
-      setDomains(d.data || []);
     } catch (e) {
       setError(e.message);
     }
@@ -40,57 +37,6 @@ export default function Phase4AdminPage() {
   useEffect(() => {
     load();
   }, []);
-
-  async function reviewDomain(problemId, action, overrideDomainId) {
-    setBusy(v => ({ ...v, [`ai_d_${problemId}`]: true }));
-    setError('');
-    setNotice('');
-    try {
-      await api.post(`/ai/problems/${problemId}/domain/review`, {
-        action,
-        overrideDomainId: overrideDomainId ? Number(overrideDomainId) : undefined,
-      });
-      setNotice(`AI Domain for problem #${problemId} ${action === 'accept' ? 'accepted' : 'overridden'} successfully.`);
-      await load();
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(v => ({ ...v, [`ai_d_${problemId}`]: false }));
-    }
-  }
-
-  async function reviewDifficulty(problemId, action, overrideDifficulty) {
-    setBusy(v => ({ ...v, [`ai_diff_${problemId}`]: true }));
-    setError('');
-    setNotice('');
-    try {
-      await api.post(`/ai/problems/${problemId}/difficulty/review`, {
-        action,
-        overrideDifficulty,
-      });
-      setNotice(`AI Difficulty for problem #${problemId} ${action === 'accept' ? 'accepted' : 'overridden'} successfully.`);
-      await load();
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(v => ({ ...v, [`ai_diff_${problemId}`]: false }));
-    }
-  }
-
-  async function reEnqueueAI(problemId) {
-    setBusy(v => ({ ...v, [`ai_q_${problemId}`]: true }));
-    setError('');
-    setNotice('');
-    try {
-      await api.post(`/ai/problems/${problemId}/re-enqueue`, {});
-      setNotice(`AI jobs re-enqueued for problem #${problemId}. Worker running.`);
-      await load();
-    } catch (e) {
-      setError(e.message);
-    } finally {
-      setBusy(v => ({ ...v, [`ai_q_${problemId}`]: false }));
-    }
-  }
 
   async function classify(id, e) {
     e.preventDefault();
@@ -177,8 +123,7 @@ export default function Phase4AdminPage() {
 
     try {
       const r = await api.post('/admin/phase4/jobs/run', {});
-      const aiR = await api.post('/ai/jobs/run', {});
-      setNotice(`Lifecycle jobs: ${JSON.stringify(r.data || r)} | AI Worker: ${JSON.stringify(aiR.data || aiR)}`);
+      alert(JSON.stringify(r.data || r));
       await load();
     } catch (e) {
       setError(e.message);
@@ -188,303 +133,153 @@ export default function Phase4AdminPage() {
   return (
     <div style={{ display: 'grid', gap: 18, maxWidth: 1100 }}>
       <div>
-        <p className="eyebrow">PLATFORM ADMIN · CLASSIFICATION & AI ASSISTANCE</p>
-        <h1>Classification, AI review & selection</h1>
+        <p className="eyebrow">PLATFORM ADMIN · PHASE 4</p>
+        <h1>Classification and selection</h1>
         <p>
-          Review AI-assisted domain suggestions, verify problem classifications, score eligible proposals, and activate student projects.
+          Classify problems, score eligible proposals and make the final
+          selection. Selection requires approval from all routed universities
+          and observes the active-project cap.
         </p>
-        <Button onClick={jobs}>Run lifecycle & AI jobs now</Button>
+        <Button onClick={jobs}>Run lifecycle jobs now</Button>
       </div>
 
-      {error && <p role="alert" style={{ color: 'var(--color-danger, #d32f2f)', background: '#ffebee', padding: 12, borderRadius: 6 }}>{error}</p>}
-      {notice && <p role="status" style={{ color: 'var(--color-success, #2e7d32)', background: '#e8f5e9', padding: 12, borderRadius: 6 }}>{notice}</p>}
+      {error && <p role="alert">{error}</p>}
+      {notice && <p role="status">{notice}</p>}
 
-      <h2>Problems & AI Review</h2>
+      <h2>Problem classification</h2>
 
       {problems.map(p => (
-        <Card key={p.id} style={{ padding: 20, display: 'grid', gap: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-            <div>
-              <h3 style={{ margin: '0 0 6px 0' }}>#{p.id} · {p.title}</h3>
-              <p style={{ margin: 0, color: '#666' }}>
-                Status: <strong>{p.status}</strong> · {p.routed_universities} routed universities ·{' '}
-                {p.application_count} applications
-              </p>
-            </div>
-            <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
-              <Badge variant="neutral">{p.domain_name || 'Unclassified Domain'}</Badge>
-              <Badge variant={p.difficulty === 'hard' ? 'danger' : p.difficulty === 'medium' ? 'warning' : 'info'}>
-                {p.difficulty ? p.difficulty.toUpperCase() : 'NO DIFFICULTY'}
-              </Badge>
-            </div>
-          </div>
+        <Card key={p.id} style={{ padding: 18 }}>
+          <h3>#{p.id} · {p.title}</h3>
+          <p>
+            {p.status} · {p.routed_universities} routed universities ·{' '}
+            {p.application_count} applications
+          </p>
 
-          <div style={{ background: '#f8f9fa', border: '1px solid #e9ecef', borderRadius: 8, padding: 14 }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '0.9rem', color: '#555' }}>
-              <strong>Citizen Description:</strong> {p.description}
-            </p>
-          </div>
-
-          {/* ── AI Assistance Section ── */}
-          <div style={{ border: '1px solid #d0e2ff', background: '#f0f6ff', borderRadius: 8, padding: 16 }}>
-            <h4 style={{ margin: '0 0 12px 0', display: 'flex', alignItems: 'center', gap: 8, color: '#0043ce' }}>
-              🤖 AI Assistance Review
-            </h4>
-
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
-              {/* Domain AI */}
-              <div style={{ background: '#ffffff', padding: 12, borderRadius: 6, border: '1px solid #c6dcff' }}>
-                <p style={{ margin: '0 0 6px 0', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: 600, color: '#525252' }}>
-                  AI Suggested Domain
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                    {p.ai_suggested_domain_name || '—'}
-                  </span>
-                  <Badge variant={p.ai_domain_status === 'accepted' ? 'success' : p.ai_domain_status === 'overridden' ? 'warning' : p.ai_domain_status === 'failed' ? 'danger' : 'info'}>
-                    {p.ai_domain_status || 'pending'}
-                  </Badge>
-                </div>
-                {p.ai_domain_explanation && (
-                  <p style={{ fontSize: '0.85rem', margin: '0 0 10px 0', color: '#444' }}>
-                    <em>"{p.ai_domain_explanation}"</em>
-                  </p>
-                )}
-
-                {p.ai_domain_status === 'suggested' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-                    <Button
-                      onClick={() => reviewDomain(p.id, 'accept')}
-                      disabled={busy[`ai_d_${p.id}`]}
-                    >
-                      Accept AI Domain
-                    </Button>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <select
-                        id={`override-domain-${p.id}`}
-                        defaultValue={p.domain_id || ''}
-                        style={{ padding: 6, flex: 1, borderRadius: 4, border: '1px solid #ccc' }}
-                      >
-                        <option value="">Select Domain...</option>
-                        {domains.map(d => (
-                          <option key={d.id} value={d.id}>{d.name}</option>
-                        ))}
-                      </select>
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          const val = document.getElementById(`override-domain-${p.id}`).value;
-                          if (val) reviewDomain(p.id, 'override', val);
-                        }}
-                        disabled={busy[`ai_d_${p.id}`]}
-                      >
-                        Override
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {p.ai_domain_status === 'failed' && (
-                  <Button variant="secondary" onClick={() => reEnqueueAI(p.id)} disabled={busy[`ai_q_${p.id}`]}>
-                    Retry AI Analysis
-                  </Button>
-                )}
-              </div>
-
-              {/* Difficulty AI */}
-              <div style={{ background: '#ffffff', padding: 12, borderRadius: 6, border: '1px solid #c6dcff' }}>
-                <p style={{ margin: '0 0 6px 0', fontSize: '0.85rem', textTransform: 'uppercase', fontWeight: 600, color: '#525252' }}>
-                  AI Predicted Difficulty
-                </p>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-                  <span style={{ fontSize: '1.1rem', fontWeight: 600, textTransform: 'capitalize' }}>
-                    {p.ai_suggested_difficulty || '—'}
-                  </span>
-                  <Badge variant={p.ai_difficulty_status === 'accepted' ? 'success' : p.ai_difficulty_status === 'overridden' ? 'warning' : p.ai_difficulty_status === 'failed' ? 'danger' : 'info'}>
-                    {p.ai_difficulty_status || 'pending'}
-                  </Badge>
-                </div>
-                {p.ai_difficulty_reason && (
-                  <p style={{ fontSize: '0.85rem', margin: '0 0 10px 0', color: '#444' }}>
-                    <em>"{p.ai_difficulty_reason}"</em>
-                  </p>
-                )}
-
-                {p.ai_difficulty_status === 'suggested' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 8 }}>
-                    <Button
-                      onClick={() => reviewDifficulty(p.id, 'accept')}
-                      disabled={busy[`ai_diff_${p.id}`]}
-                    >
-                      Accept AI Difficulty
-                    </Button>
-                    <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                      <select
-                        id={`override-diff-${p.id}`}
-                        defaultValue={p.difficulty || 'medium'}
-                        style={{ padding: 6, flex: 1, borderRadius: 4, border: '1px solid #ccc' }}
-                      >
-                        <option value="small">Small</option>
-                        <option value="medium">Medium</option>
-                        <option value="hard">Hard</option>
-                      </select>
-                      <Button
-                        variant="secondary"
-                        onClick={() => {
-                          const val = document.getElementById(`override-diff-${p.id}`).value;
-                          reviewDifficulty(p.id, 'override', val);
-                        }}
-                        disabled={busy[`ai_diff_${p.id}`]}
-                      >
-                        Override
-                      </Button>
-                    </div>
-                  </div>
-                )}
-                {p.ai_difficulty_status === 'failed' && (
-                  <Button variant="secondary" onClick={() => reEnqueueAI(p.id)} disabled={busy[`ai_q_${p.id}`]}>
-                    Retry AI Analysis
-                  </Button>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* ── Official Classification Form ── */}
-          <details style={{ marginTop: 8 }}>
-            <summary style={{ cursor: 'pointer', fontWeight: 600, color: '#333' }}>
-              ⚙️ Problem Classification Settings & Application Window
-            </summary>
-            <form
-              onSubmit={e => classify(p.id, e)}
-              style={{
-                display: 'flex',
-                gap: 12,
-                flexWrap: 'wrap',
-                alignItems: 'end',
-                marginTop: 14,
-                padding: 14,
-                background: '#fafafa',
-                borderRadius: 6
-              }}
-            >
-              <label>
-                Difficulty
-                <select
-                  name="difficulty"
-                  defaultValue={p.difficulty || p.ai_suggested_difficulty || 'medium'}
-                >
-                  <option value="small">Small</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
-              </label>
-
-              <label>
-                Domain
-                <select
-                  name="domain_id"
-                  defaultValue={p.domain_id || p.ai_suggested_domain_id || ''}
-                >
-                  <option value="">Keep current ({p.domain_name || 'None'})</option>
-                  {domains.map(d => (
-                    <option key={d.id} value={d.id}>{d.name}</option>
-                  ))}
-                </select>
-              </label>
-
-              <label>
-                Application hours
-                <input
-                  name="window_hours"
-                  type="number"
-                  min="1"
-                  max="720"
-                  defaultValue="48"
-                />
-              </label>
-
-              <label>
-                Review hours
-                <input
-                  name="review_hours"
-                  type="number"
-                  min="1"
-                  max="720"
-                  defaultValue="48"
-                />
-              </label>
-
-              <label style={{ minWidth: '100%' }}>
-                Required expertise / skills (comma-separated)
-                <input
-                  name="required_skills"
-                  type="text"
-                  style={{ width: '100%' }}
-                  defaultValue={(p.required_skills || []).join(', ')}
-                  placeholder="e.g. computer vision, IoT, GIS, sensors"
-                />
-                <small style={{ color: '#666' }}>
-                  Only verified universities with a matching department or team-member profile will be routed.
-                </small>
-              </label>
-
-              <label>
-                <input
-                  name="needs_authority"
-                  type="checkbox"
-                  defaultChecked={p.needs_authority}
-                />
-                {' '}Needs municipal/local authority coordination
-              </label>
-
-              <fieldset style={{ minWidth: '100%', border: '1px solid #ddd', borderRadius: 4, padding: 8 }}>
-                <legend style={{ fontSize: '0.85rem', fontWeight: 600 }}>Allowed solution types</legend>
-                {TYPES.map(t => (
-                  <label key={t} style={{ marginRight: 14, display: 'inline-block' }}>
-                    <input
-                      type="checkbox"
-                      name="solution_types"
-                      value={t}
-                      defaultChecked={(p.solution_types || []).includes(t)}
-                    />
-                    {' '}{t.replaceAll('_', ' ')}
-                  </label>
-                ))}
-              </fieldset>
-
-              <Button
-                type="submit"
-                disabled={busy[`p${p.id}`]}
+          <form
+            onSubmit={e => classify(p.id, e)}
+            style={{
+              display: 'flex',
+              gap: 12,
+              flexWrap: 'wrap',
+              alignItems: 'end'
+            }}
+          >
+            <label>
+              Difficulty
+              <select
+                name="difficulty"
+                defaultValue={p.difficulty || 'medium'}
               >
-                Save classification, route universities and open window
-              </Button>
-            </form>
-          </details>
+                <option value="small">Small</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+              </select>
+            </label>
+
+            <label>
+              Domain ID
+              <input
+                name="domain_id"
+                type="number"
+                min="1"
+                defaultValue=""
+                placeholder={p.domain_name || 'Keep current'}
+              />
+            </label>
+
+            <label>
+              Application hours
+              <input
+                name="window_hours"
+                type="number"
+                min="1"
+                max="720"
+                defaultValue="48"
+              />
+            </label>
+
+            <label>
+              Review hours
+              <input
+                name="review_hours"
+                type="number"
+                min="1"
+                max="720"
+                defaultValue="48"
+              />
+            </label>
+
+            <label style={{ minWidth: '100%' }}>
+              Required expertise / skills (comma-separated)
+              <input
+                name="required_skills"
+                type="text"
+                style={{ width: '100%' }}
+                defaultValue={(p.required_skills || []).join(', ')}
+                placeholder="e.g. computer vision, IoT, GIS, sensors"
+              />
+              <small>
+                Only verified universities with a matching department or
+                team-member profile will be routed. Use real skills relevant
+                to this problem.
+              </small>
+            </label>
+
+            <label>
+              <input
+                name="needs_authority"
+                type="checkbox"
+                defaultChecked={p.needs_authority}
+              />
+              Needs authority
+            </label>
+
+            <fieldset style={{ minWidth: '100%' }}>
+              <legend>Allowed solution types</legend>
+              {TYPES.map(t => (
+                <label key={t} style={{ marginRight: 12 }}>
+                  <input
+                    type="checkbox"
+                    name="solution_types"
+                    value={t}
+                    defaultChecked={(p.solution_types || []).includes(t)}
+                  />
+                  {' '}{t.replaceAll('_', ' ')}
+                </label>
+              ))}
+            </fieldset>
+
+            <Button
+              type="submit"
+              disabled={busy[`p${p.id}`]}
+            >
+              Save skills, route universities and open window
+            </Button>
+          </form>
 
           {p.window_closes_at && (
-            <small style={{ color: '#555' }}>
+            <small>
               Window closes {new Date(p.window_closes_at).toLocaleString()} ·
-              {' '}Review deadline{' '}
+              {' '}review deadline{' '}
               {p.review_deadline
                 ? new Date(p.review_deadline).toLocaleString()
                 : '—'}
             </small>
           )}
 
-          <div style={{ display: 'flex', gap: 8 }}>
-            <Button
-              variant="secondary"
-              onClick={() => rank(p.id)}
-              disabled={
-                busy[`r${p.id}`] ||
-                !['open_for_applications', 'window_closed'].includes(p.status) ||
-                !p.review_deadline ||
-                new Date(p.review_deadline).getTime() > Date.now()
-              }
-            >
-              Close window / Rank proposals when eligible
-            </Button>
-          </div>
+          <Button
+            variant="secondary"
+            onClick={() => rank(p.id)}
+            disabled={
+              busy[`r${p.id}`] ||
+              !['open_for_applications', 'window_closed'].includes(p.status) ||
+              !p.review_deadline ||
+              new Date(p.review_deadline).getTime() > Date.now()
+            }
+          >
+            Close / rank when eligible
+          </Button>
         </Card>
       ))}
 
@@ -495,7 +290,7 @@ export default function Phase4AdminPage() {
           <h3>{a.problem_title} · {a.team_name}</h3>
 
           <p>
-            Application #{a.id} · Status: <strong>{a.status}</strong>
+            Application #{a.id} · {a.status}
           </p>
 
           {a.mentor_name && <p>Mentor: {a.mentor_name}</p>}
@@ -529,7 +324,6 @@ export default function Phase4AdminPage() {
                 max="5"
                 step="0.5"
                 defaultValue={a.proposal_score || 3}
-                style={{ width: 80, padding: 4 }}
               />
             </label>
 
@@ -557,7 +351,7 @@ export default function Phase4AdminPage() {
           </div>
 
           {a.score_breakdown && (
-            <pre style={{ whiteSpace: 'pre-wrap', background: '#f5f5f5', padding: 8, borderRadius: 4, marginTop: 8 }}>
+            <pre style={{ whiteSpace: 'pre-wrap' }}>
               {JSON.stringify(a.score_breakdown, null, 2)}
             </pre>
           )}

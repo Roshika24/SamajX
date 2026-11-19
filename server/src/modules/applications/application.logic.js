@@ -33,12 +33,9 @@ async function listAvailableProblems(userId) {
      JOIN problems p ON p.id = pr.problem_id
      LEFT JOIN domains d ON d.id = p.domain_id
      WHERE pr.university_id = $1
-       AND p.status NOT IN ('resolved_duplicate', 'rejected_spam')
-     ORDER BY 
-       CASE WHEN p.status = 'open_for_applications' AND (p.window_closes_at IS NULL OR p.window_closes_at > NOW()) THEN 0 ELSE 1 END,
-       p.priority_score DESC,
-       pr.distance_km ASC,
-       p.created_at DESC`,
+       AND p.status = 'open_for_applications'
+       AND (p.window_closes_at IS NULL OR p.window_closes_at > NOW())
+     ORDER BY p.priority_score DESC, pr.distance_km ASC, p.created_at DESC`,
     [team.university_id]
   );
 
@@ -406,10 +403,6 @@ async function listUniversityReviews(userId) {
        p.id AS problem_id,
        p.title AS problem_title,
        p.difficulty,
-       p.ai_suggested_difficulty,
-       p.ai_difficulty_reason,
-       p.ai_difficulty_status,
-       p.ai_difficulty_review_action,
        p.needs_authority,
        t.id AS team_id,
        t.name AS team_name,
@@ -428,40 +421,6 @@ async function listUniversityReviews(userId) {
     [universityId]
   );
 
-  return rows;
-}
-
-async function listUniversityProblems(userId) {
-  const universityId = await getUniversityId(userId);
-  const { rows } = await pool.query(
-    `SELECT p.id, p.title, p.description, p.status, p.difficulty, p.solution_types,
-            p.needs_authority, p.created_at, p.window_closes_at,
-            d.name AS domain_name,
-            COALESCE(
-              pr.distance_km,
-              CASE WHEN u.lat IS NOT NULL AND u.lng IS NOT NULL AND p.lat IS NOT NULL AND p.lng IS NOT NULL
-                   THEN round((earth_distance(ll_to_earth(u.lat, u.lng), ll_to_earth(p.lat, p.lng)) / 1000.0)::numeric, 1)
-                   ELSE 0 END
-            ) AS distance_km,
-            CASE WHEN COALESCE(
-              pr.distance_km,
-              CASE WHEN u.lat IS NOT NULL AND u.lng IS NOT NULL AND p.lat IS NOT NULL AND p.lng IS NOT NULL
-                   THEN (earth_distance(ll_to_earth(u.lat, u.lng), ll_to_earth(p.lat, p.lng)) / 1000.0)
-                   ELSE 0 END
-            ) > 150 THEN 'Far away' ELSE 'Within range' END AS distance_label,
-            p.ai_suggested_difficulty,
-            p.ai_difficulty_reason,
-            p.ai_difficulty_status,
-            p.ai_difficulty_review_action
-     FROM problems p
-     CROSS JOIN universities u
-     LEFT JOIN domains d ON d.id = p.domain_id
-     LEFT JOIN problem_routes pr ON pr.problem_id = p.id AND pr.university_id = u.id
-     WHERE u.id = $1
-       AND p.status NOT IN ('resolved_duplicate', 'rejected_spam')
-     ORDER BY p.created_at DESC`,
-    [universityId]
-  );
   return rows;
 }
 
@@ -620,7 +579,6 @@ async function rankProblemApplications(problemId, adminId = null) {
 
     const { rows: apps } = await client.query(
       `SELECT a.id, a.team_id, a.proposal_score, t.level_score,
-         pr.distance_km,
          CASE
            WHEN p.domain_id IS NOT NULL AND EXISTS (
              SELECT 1
@@ -639,7 +597,6 @@ async function rankProblemApplications(problemId, adminId = null) {
        JOIN teams t ON t.id=a.team_id
        JOIN problems p ON p.id=a.problem_id
        LEFT JOIN domains d ON d.id=p.domain_id
-       LEFT JOIN problem_routes pr ON pr.problem_id=a.problem_id AND pr.university_id=t.university_id
        WHERE a.problem_id=$1
          AND a.status NOT IN ('rejected','withdrawn','not_selected')
          AND EXISTS (
@@ -662,8 +619,7 @@ async function rankProblemApplications(problemId, adminId = null) {
         levelScore: a.level_score,
         domainFit: a.domain_fit,
         proposalScore: a.proposal_score,
-        difficulty: problem.difficulty,
-        distanceKm: a.distance_km,
+        difficulty: problem.difficulty
       }, config);
 
       return {
@@ -961,26 +917,15 @@ async function listAdminProblems() {
   const { rows } = await pool.query(
     `SELECT p.id,p.title,p.description,p.status,p.difficulty,p.solution_types,p.required_skills,
        p.needs_authority,p.window_closes_at,p.review_deadline,p.created_at,
-       p.domain_id,
        d.name AS domain_name,
-       p.ai_suggested_domain_id,
-       d_ai.name AS ai_suggested_domain_name,
-       p.ai_domain_explanation,
-       p.ai_domain_status,
-       p.ai_domain_review_action,
-       p.ai_suggested_difficulty,
-       p.ai_difficulty_reason,
-       p.ai_difficulty_status,
-       p.ai_difficulty_review_action,
        COUNT(DISTINCT pr.university_id)::int AS routed_universities,
        COUNT(DISTINCT a.id)::int AS application_count
      FROM problems p
      LEFT JOIN domains d ON d.id=p.domain_id
-     LEFT JOIN domains d_ai ON d_ai.id=p.ai_suggested_domain_id
      LEFT JOIN problem_routes pr ON pr.problem_id=p.id
      LEFT JOIN applications a ON a.problem_id=p.id
      WHERE p.status NOT IN ('resolved_duplicate','rejected_spam')
-     GROUP BY p.id,d.name,d_ai.name
+     GROUP BY p.id,d.name
      ORDER BY p.created_at DESC`
   );
 
@@ -1106,7 +1051,6 @@ module.exports = {
   classifyProblem,
   submitApplication,
   listMyApplications,
-  listUniversityProblems,
   listUniversityReviews,
   reviewApplication,
   rankProblemApplications,

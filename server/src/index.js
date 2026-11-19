@@ -48,13 +48,10 @@ function createApp() {
   app.use('/api/problems', require('./modules/problems/problem.routes'));
   app.use('/api/applications', require('./modules/applications/application.routes'));
   app.use('/api/admin/phase4', require('./modules/admin/phase4.routes'));
-  // Phase 5: project execution, completion sign-off and certificates.
-  app.use('/api/projects', require('./modules/projects/project.routes'));
-  // Phase 6: AI-assisted domain classification and difficulty prediction.
-  app.use('/api/ai', require('./modules/ai/ai.routes'));
 
   // Future phase routes will be mounted here:
   // app.use('/api/applications', require('./modules/applications/app.routes'));
+  // app.use('/api/projects',     require('./modules/projects/project.routes'));
   // app.use('/api/sponsorships', require('./modules/sponsorships/sponsor.routes'));
   // app.use('/api/companies',    require('./modules/companies/company.routes'));
   // app.use('/api/certificates', require('./modules/certificates/cert.routes'));
@@ -90,24 +87,10 @@ if (require.main === module) {
   phase4Jobs.runLifecycleJobs().catch((err) => {
     console.error('[CivicPulse] Initial Phase 4 lifecycle job failed:', err.message);
   });
-
-  // Phase 6: AI asynchronous background job runner
-  const aiWorker = require('./modules/ai/ai.worker');
-  const aiTimer = setInterval(() => {
-    aiWorker.runAIWorker({ batchSize: 5 }).catch((err) => {
-      console.error('[CivicPulse] AI worker background job failed:', err.message);
-    });
-  }, 30 * 1000);
-  aiTimer.unref();
-  aiWorker.runAIWorker({ batchSize: 5 }).catch((err) => {
-    console.error('[CivicPulse] Initial AI worker job run failed:', err.message);
-  });
-
   const pool = require('./db/pool');
   const shutdown = (signal) => {
     console.log(`[CivicPulse] ${signal} received; shutting down`);
     clearInterval(lifecycleTimer);
-    clearInterval(aiTimer);
     server.close(async () => {
       try {
         await pool.end();
