@@ -22,3 +22,7 @@ client/dist/
 
 # Logs
 *.log
+
+# Temporary backup files
+*.bak
+*.pre-router7

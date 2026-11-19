@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { to: '/admin/university/problems', label: 'Problems' },
   { to: '/admin/university/applications', label: 'Applications' },
   { to: '/admin/university/evidence', label: 'Evidence Queue' },
+  { to: '/admin/university/completions', label: 'Completion Review' },
 ];
 
 export default function UniversityLayout() {

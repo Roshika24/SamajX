@@ -9,6 +9,7 @@ export default function UniversityDashboard() {
   const [university, setUniversity] = useState(null);
   const [leaders, setLeaders] = useState([]);
   const [evidence, setEvidence] = useState([]);
+  const [problems, setProblems] = useState([]);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
 
@@ -16,12 +17,14 @@ export default function UniversityDashboard() {
     const result = await api.get('/universities/me');
     const uni = result.data.university;
     setUniversity(uni);
-    const [leaderResult, evidenceResult] = await Promise.all([
+    const [leaderResult, evidenceResult, problemResult] = await Promise.all([
       api.get('/leaders?status=pending&limit=100'),
       api.get(`/evidence/queue/${uni.id}?limit=100`),
+      api.get('/applications/university/problems').catch(() => ({ data: [] })),
     ]);
     setLeaders(leaderResult.data || []);
     setEvidence(evidenceResult.data || []);
+    setProblems(problemResult.data || []);
   }, []);
   useEffect(() => { refresh().catch(e => setError(e.message)); }, [refresh]);
 
@@ -53,5 +56,40 @@ export default function UniversityDashboard() {
     <section><h2>Departments</h2><div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>{(university?.departments || []).map(d => <Badge key={d.id}>{d.name}</Badge>)}</div></section>
     <section><h2>Leader approval queue <span style={{ color: 'var(--color-purple)' }}>({leaders.length})</span></h2>{leaders.length ? <div style={{ display: 'grid', gap: 12 }}>{leaders.map(l => <Card key={l.id} style={{ padding: 18 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}><div><strong>{l.display_name}</strong><p style={{ margin: '4px 0', color: 'var(--color-ink-muted)' }}>{l.email} · {l.enrollment_number || 'Enrollment not set'} · {l.branch || 'Branch not set'} · Year {l.year || '—'}</p></div><div style={{ display: 'flex', gap: 8 }}><Button size="sm" onClick={() => action(`/leaders/${l.id}/approve`, l.id)} loading={busyId === l.id}>Approve</Button><Button size="sm" variant="secondary" onClick={() => action(`/leaders/${l.id}/reject`, l.id)} loading={busyId === l.id}>Reject</Button></div></div></Card>)}</div> : <EmptyState title="No leaders waiting" description="New leader signups using your promo code will appear here." />}</section>
     <section><h2>Evidence verification <span style={{ color: 'var(--color-purple)' }}>({evidence.length})</span></h2>{evidence.length ? <div style={{ display: 'grid', gap: 12 }}>{evidence.map(item => <Card key={item.id} style={{ padding: 18 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}><div><strong>{item.title}</strong><p style={{ margin: '4px 0', color: 'var(--color-ink-muted)' }}>{item.member_name} · {item.team_name} · {item.type}</p>{item.description && <p>{item.description}</p>}{item.link && <a href={item.link} target="_blank" rel="noreferrer">View evidence ↗</a>}</div><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><Button size="sm" onClick={() => action(`/evidence/${item.id}/verify`, item.id)} loading={busyId === item.id}>Verify</Button><Button size="sm" variant="secondary" onClick={() => action(`/evidence/${item.id}/reject`, item.id)} loading={busyId === item.id}>Reject</Button></div></div></Card>)}</div> : <EmptyState title="Evidence queue is clear" description="Submitted projects, hackathons, internships and faculty experience will appear here." />}</section>
+    <section>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h2>Civic Problems & Projects <span style={{ color: 'var(--color-purple)' }}>({problems.length})</span></h2>
+        <a href="/admin/university/problems" style={{ fontSize: '0.9rem', fontWeight: 600 }}>Review in detail →</a>
+      </div>
+      <p style={{ color: 'var(--color-ink-muted)', marginTop: -6 }}>
+        All civic problems across the platform. Larger distances are labelled as <strong>Far away</strong>.
+      </p>
+      {problems.length ? (
+        <div style={{ display: 'grid', gap: 12 }}>
+          {problems.map(p => (
+            <Card key={p.id} style={{ padding: 16 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
+                <div>
+                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1rem' }}>#{p.id} · {p.title}</h3>
+                  <p style={{ margin: '0 0 6px 0', color: 'var(--color-ink-muted)', fontSize: '0.85rem' }}>
+                    Domain: {p.domain_name || 'Unassigned'} · Difficulty: {p.difficulty || p.ai_suggested_difficulty || 'Pending'}
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+                  <Badge variant={p.distance_label === 'Far away' ? 'danger' : 'info'}>
+                    📍 {p.distance_km} km {p.distance_label === 'Far away' ? '· Far away' : '· Within range'}
+                  </Badge>
+                  <Badge variant={p.status === 'open_for_applications' ? 'success' : 'default'}>
+                    {p.status}
+                  </Badge>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <EmptyState title="No civic problems found" description="Reported community problems will appear here." />
+      )}
+    </section>
   </div>;
 }

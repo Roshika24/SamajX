@@ -25,6 +25,10 @@ import LeaderProblemsPage from './pages/leader/LeaderProblemsPage';
 import LeaderApplicationsPage from './pages/leader/LeaderApplicationsPage';
 import UniversityProblemsPage from './pages/university/UniversityProblemsPage';
 import Phase4AdminPage from './pages/admin/Phase4AdminPage';
+import LeaderProjectsPage from './pages/leader/LeaderProjectsPage';
+import LeaderCertificatesPage from './pages/leader/LeaderCertificatesPage';
+import UniversityCompletionPage from './pages/university/UniversityCompletionPage';
+import CertificateVerifyPage from './pages/public/CertificateVerifyPage';
 
 import UniversityDashboard from './pages/university/UniversityDashboard';
 import UniversityTeamsPage from './pages/university/UniversityTeamsPage';
@@ -68,7 +72,7 @@ export default function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/register/leader" element={<LeaderRegisterPage />} />
         
-          <Route path="/verify/:code" element={<FeaturePage title="Certificate verification" description="Public certificate verification will be available when the certificate module is implemented." />} />
+          <Route path="/verify/:code" element={<CertificateVerifyPage />} />
         </Route>
 
         <Route element={<ProtectedRoute requiredRole="citizen"><CitizenLayout /></ProtectedRoute>}>
@@ -84,7 +88,8 @@ export default function App() {
           <Route path="/leader/team" element={<LeaderTeamPage />} />
           <Route path="/leader/problems" element={<LeaderProblemsPage />} />
           <Route path="/leader/applications" element={<LeaderApplicationsPage />} />
-          <Route path="/leader/certificates" element={<FeaturePage eyebrow="TEAM LEADER · CERTIFICATES" title="Team certificates" description="Access certificates earned by your team." nextStep="Certificate generation and verification are Phase 5 features and are not yet implemented." />} />
+          <Route path="/leader/projects" element={<LeaderProjectsPage />} />
+          <Route path="/leader/certificates" element={<LeaderCertificatesPage />} />
         </Route>
 
         <Route element={<ProtectedRoute requiredRole="university_admin"><UniversityLayout /></ProtectedRoute>}>
@@ -93,6 +98,7 @@ export default function App() {
   <Route path="/admin/university/problems" element={<UniversityProblemsPage />} />
   <Route path="/admin/university/applications" element={<UniversityProblemsPage />} />
   <Route path="/admin/university/evidence" element={<FeaturePage eyebrow="UNIVERSITY · EVIDENCE" title="Evidence verification" description="Review and verify member credentials." nextStep="The current university dashboard already contains the Phase 2 evidence queue. This route is a dedicated view placeholder until that workflow is extracted into its own page." />} />
+  <Route path="/admin/university/completions" element={<UniversityCompletionPage />} />
 </Route>
 
         <Route element={<ProtectedRoute requiredRole="company"><CompanyLayout /></ProtectedRoute>}>

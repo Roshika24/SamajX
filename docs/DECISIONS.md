@@ -135,3 +135,12 @@ All destinations shown in role sidebars must be registered as protected React Ro
 ## D-ROUTE-002 — University team directory scope (2026-11-13)
 
 The university team directory is scoped by the authenticated university admin's university ID on the server. A platform admin must provide an explicit `university_id`; the API does not expose an unbounded cross-university team listing by default.
+
+## D-PHASE5-001 — Reduced Phase 5 scope (2026-11-18)
+
+Implement only project milestones/progress, final report and proof, university completion sign-off, PDF certificates and public verification. Defer sponsorship, company project gallery, email notifications and unrelated dashboard redesign. Certificate issuance occurs only after the owning university admin approves completion. Reopening requires written feedback.
+
+## D-PHASE6-001 — Asynchronous AI layer with human-in-the-loop review (2026-11-19)
+
+Phase 6 implements exactly two approved AI features: AI-assisted problem-domain classification and AI-assisted problem-difficulty prediction. Both run asynchronously via a database-backed job queue (`ai_jobs`) with bounded retries and transactional row locking. Citizen problem submissions return immediately and are never blocked by external LLM provider calls. Prior to external transmission, all problem text is sanitized of PII (emails, phone numbers, auth tokens) and bounded to 2000 characters. LLM responses are strictly validated JSON matching the database domain taxonomy and allowed difficulty enum ('small', 'medium', 'hard'). Platform Admin is the authoritative reviewer for problem domains; University Admin is the authoritative reviewer for difficulty predictions. Original AI suggestions and explanations are immutably preserved alongside human review decisions.
+

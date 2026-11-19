@@ -17,7 +17,7 @@ CivicPulse is a university-linked civic problem-to-solution platform. The reposi
 - Phase 4 problem classification, application windows, mentor consent links, cross-university review, proposal ranking, atomic project claim and activation.
 - Leader, University Admin and Platform Admin Phase 4 workspaces; in-app review/selection notifications and retry-safe lifecycle jobs.
 
-Project execution, milestones, completion, certificates and sponsorship remain later-phase work. Phase 4 mentor invitations currently use a time-limited shareable link; SMTP delivery is not configured.
+Phase 5 reduced scope includes leader milestone/proof updates, final report submission, university completion sign-off, member certificates and public certificate verification/PDF download. Sponsorship pledges, company project gallery and email notifications are deferred. Phase 4 mentor invitations currently use a time-limited shareable link; SMTP delivery is not configured.
 
 ## Requirements
 

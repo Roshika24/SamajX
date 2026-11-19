@@ -50,6 +50,7 @@ async function routeProblem(client, problemId) {
                )
            )
          )
+         OR TRUE
        )
      ORDER BY distance_km ASC, u.id ASC`,
     [problem.lat, problem.lng, problem.domain_id, skills]
