@@ -29,7 +29,13 @@ async function callClaude({
   model = config.ai.model,
   timeoutMs = config.ai.timeoutMs,
 }) {
-  if (!apiKey) {
+  const isPlaceholderKey = !apiKey ||
+    apiKey.includes('your-actual-key') ||
+    apiKey.includes('your_') ||
+    apiKey.includes('placeholder') ||
+    apiKey === 'your_anthropic_api_key_here';
+
+  if (isPlaceholderKey) {
     if (config.server.isDev || process.env.AI_PROVIDER === 'mock') {
       return generateDevFallbackResponse({ systemPrompt, userPrompt });
     }
@@ -70,6 +76,11 @@ async function callClaude({
         errorMsg = errorBody.slice(0, 200) || errorMsg;
       }
 
+      if (config.server.isDev) {
+        console.warn(`[AI] Provider returned ${response.status}: ${errorMsg}. Falling back to dev mock.`);
+        return generateDevFallbackResponse({ systemPrompt, userPrompt });
+      }
+
       if (response.status === 401 || response.status === 403) {
         throw new AIProviderError(`Invalid AI provider credentials: ${errorMsg}`, 502, 'AI_AUTH_ERROR', false);
       }
@@ -91,6 +102,10 @@ async function callClaude({
     return contentBlock.text;
   } catch (err) {
     clearTimeout(timer);
+    if (config.server.isDev) {
+      console.warn(`[AI] Network/Provider call failed: ${err.message}. Falling back to dev mock.`);
+      return generateDevFallbackResponse({ systemPrompt, userPrompt });
+    }
     if (err instanceof AIProviderError) throw err;
 
     if (err.name === 'AbortError') {
@@ -110,10 +125,10 @@ function generateDevFallbackResponse({ systemPrompt, userPrompt }) {
 
   // 1. Difficulty prediction prompt
   if (systemPrompt.includes('"difficulty": "small" | "medium" | "hard"') || userPrompt.includes('Predict the implementation difficulty')) {
-    if (text.includes('bridge') || text.includes('structural') || text.includes('telemetry') || text.includes('sensor network') || text.includes('treatment plant')) {
+    if (text.includes('bridge') || text.includes('structural') || text.includes('telemetry') || text.includes('sensor network') || text.includes('treatment plant') || text.includes('chemical') || text.includes('factory')) {
       return JSON.stringify({
         difficulty: 'hard',
-        explanation: 'Requires complex structural analysis, multi-stakeholder hardware engineering, and advanced telemetry deployment.'
+        explanation: 'Requires complex chemical contaminant remediation, soil testing protocols, multi-stakeholder intervention, and environmental safety gear.'
       });
     }
     if (text.includes('pothole') || text.includes('trash') || text.includes('litter') || text.includes('survey') || text.includes('photo')) {
@@ -129,6 +144,18 @@ function generateDevFallbackResponse({ systemPrompt, userPrompt }) {
   }
 
   // 2. Domain classification prompt
+  if (text.includes('soil') || text.includes('crop') || text.includes('farm') || text.includes('vegetation') || text.includes('agriculture') || text.includes('fertilizer') || text.includes('plant')) {
+    return JSON.stringify({
+      domain_slug: 'agriculture',
+      explanation: 'The issue directly impacts agricultural soil quality, local farmland vegetation, and community crop sustainability.'
+    });
+  }
+  if (text.includes('chemical') || text.includes('toxic') || text.includes('factory') || text.includes('pollution') || text.includes('effluent') || text.includes('emission')) {
+    return JSON.stringify({
+      domain_slug: 'environmental',
+      explanation: 'Involves industrial effluent, toxic chemical discharge, and environmental mitigation protocols.'
+    });
+  }
   if (text.includes('water') || text.includes('flood') || text.includes('drain') || text.includes('sewage') || text.includes('pipe') || text.includes('leak')) {
     return JSON.stringify({
       domain_slug: 'water_sanitation',
