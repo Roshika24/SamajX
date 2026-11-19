@@ -130,6 +130,16 @@ const config = {
     email: (process.env.ADMIN_EMAIL || 'admin@civicpulse.local').trim().toLowerCase(),
     password: process.env.ADMIN_PASSWORD || 'admin123',
   },
+
+  /* ── AI Layer (Phase 6) ── */
+  ai: {
+    enabled: process.env.AI_ENABLED === 'true' || (process.env.AI_ENABLED !== 'false' && Boolean(process.env.ANTHROPIC_API_KEY)),
+    provider: process.env.AI_PROVIDER || 'anthropic',
+    apiKey: (process.env.ANTHROPIC_API_KEY || '').trim(),
+    model: process.env.AI_MODEL || 'claude-3-haiku-20240307',
+    timeoutMs: Number(process.env.AI_TIMEOUT_MS || 20000),
+    maxRetries: 3,
+  },
 };
 
 /** Fail fast on unsafe or malformed production configuration. */

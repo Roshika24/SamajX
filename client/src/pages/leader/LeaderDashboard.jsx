@@ -18,6 +18,7 @@ export default function LeaderDashboard() {
   const [evidenceMember, setEvidenceMember] = useState(null);
   const [editingMember, setEditingMember] = useState(null);
   const [expertise, setExpertise] = useState({ branch: '', speciality: '', interests: '' });
+  const [problems, setProblems] = useState([]);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -26,8 +27,12 @@ export default function LeaderDashboard() {
     setProfile(result.data.leader);
     setTeam(result.data.team);
     if (result.data.team) {
-      const detail = await api.get(`/teams/${result.data.team.id}`);
+      const [detail, probRes] = await Promise.all([
+        api.get(`/teams/${result.data.team.id}`),
+        api.get('/applications/problems').catch(() => ({ data: [] }))
+      ]);
       setTeam(detail.data);
+      setProblems(probRes.data || []);
     }
   }, []);
 
@@ -106,6 +111,42 @@ export default function LeaderDashboard() {
       </form></Card>
 
       <Card style={{ padding: 22 }}><h3>Your journey map</h3><div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>{['Team created','Build credentials','Apply to a problem','Make an impact','Earn certificates'].map((step,i) => <div key={step} style={{ display: 'flex', alignItems: 'center', gap: 8 }}><span style={{ width: 28, height: 28, borderRadius: '50%', display: 'grid', placeItems: 'center', background: i === 0 ? 'var(--color-yellow)' : 'var(--color-surface)', fontWeight: 800 }}>{i === 0 ? '✓' : i+1}</span><small>{step}</small>{i < 4 && <span aria-hidden="true">→</span>}</div>)}</div><p style={{ color: 'var(--color-ink-muted)', fontSize: 13, marginBottom: 0 }}>Your progress is motivational only. Selection decisions are made using the platform's published fairness rules.</p></Card>
+      <Card style={{ padding: 22 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div>
+            <h3 style={{ margin: 0 }}>Available Civic Problems ({problems.length})</h3>
+            <p style={{ margin: '4px 0 0 0', color: 'var(--color-ink-muted)', fontSize: 13 }}>
+              Explore real-world challenges. Problems located further away are labelled as <strong>Far away</strong>.
+            </p>
+          </div>
+          <a href="/leader/problems" style={{ fontWeight: 600, fontSize: 14 }}>View all & submit proposals →</a>
+        </div>
+
+        {problems.length ? (
+          <div style={{ display: 'grid', gap: 10 }}>
+            {problems.slice(0, 5).map(p => (
+              <div key={p.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px', background: '#f8fafc', borderRadius: 6, border: '1px solid #e2e8f0', flexWrap: 'wrap', gap: 8 }}>
+                <div>
+                  <strong style={{ fontSize: '0.95rem' }}>#{p.id} · {p.title}</strong>
+                  <div style={{ fontSize: 12, color: 'var(--color-ink-muted)', marginTop: 2 }}>
+                    Domain: {p.domain_name || 'General'} · Difficulty: {p.difficulty || 'Medium'}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                  <Badge variant={p.distance_label === 'Far away' ? 'danger' : 'info'}>
+                    📍 {p.distance_km} km {p.distance_label === 'Far away' ? '· Far away' : '· Within range'}
+                  </Badge>
+                  <Badge variant={p.status === 'open_for_applications' ? 'success' : 'default'}>
+                    {p.status === 'open_for_applications' ? 'Open for applications' : p.status}
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p style={{ color: 'var(--color-ink-muted)', fontSize: 13 }}>No problems currently open.</p>
+        )}
+      </Card>
     </>}
 
 

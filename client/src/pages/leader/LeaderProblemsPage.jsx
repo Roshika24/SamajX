@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { api } from '../../utils/api';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
+import Badge from '../../components/Badge';
 
 const field = {
   width: '100%',
@@ -146,11 +147,14 @@ export default function LeaderProblemsPage() {
             <div>
               <h2>{p.title}</h2>
               <p>{p.description}</p>
-              <small>
-                {p.domain_name || 'Unclassified'} ·{' '}
-                {p.difficulty || 'Difficulty pending'} · {p.distance_label}{' '}
-                ({Number(p.distance_km).toFixed(1)} km)
-              </small>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', alignItems: 'center', marginTop: 6 }}>
+                <Badge variant={p.distance_label === 'Far away' ? 'danger' : 'info'}>
+                  📍 {Number(p.distance_km || 0).toFixed(1)} km · {p.distance_label || 'Within range'}
+                </Badge>
+                <Badge>{p.domain_name || 'Unclassified'}</Badge>
+                <Badge variant="warning">{p.difficulty || 'Difficulty pending'}</Badge>
+                <Badge variant={p.status === 'open_for_applications' ? 'success' : 'default'}>{p.status}</Badge>
+              </div>
             </div>
             <span>{p.status}</span>
           </div>

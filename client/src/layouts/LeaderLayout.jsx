@@ -5,6 +5,7 @@ const NAV_ITEMS = [
   { to: '/leader/team', label: 'My Team' },
   { to: '/leader/problems', label: 'Browse Problems' },
   { to: '/leader/applications', label: 'Applications' },
+  { to: '/leader/projects', label: 'My Projects' },
   { to: '/leader/certificates', label: 'Certificates' },
 ];
 

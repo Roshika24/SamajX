@@ -85,6 +85,14 @@ router.get('/mine', requireRole('leader'), async (req, res, next) => {
   }
 });
 
+router.get('/university/problems', requireRole('university_admin'), async (req, res, next) => {
+  try {
+    return success(res, await logic.listUniversityProblems(req.user.id));
+  } catch (err) {
+    return next(err);
+  }
+});
+
 router.get('/university/reviews', requireRole('university_admin'), async (req, res, next) => {
   try {
     return success(res, await logic.listUniversityReviews(req.user.id));

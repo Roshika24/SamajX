@@ -708,3 +708,38 @@ Static file serving.
 Duplicate matching uses category/domain merge radius and term-frequency cosine similarity. Scores >= 0.85 auto-attach; 0.65–<0.85 wait for citizen confirmation; lower scores create a new problem. A late confirmation cannot attach to a no-longer-open problem; it creates a recurrence-linked problem instead. Reports matched to claimed or in-progress work attach without changing the claim and create an in-app notification for the team leader. Newly created problems are routed stepwise to verified universities with a matching department or relevant team-member discipline; no match marks the problem `unrouted`.
 
 **Migration note:** `003_report_merge_candidates.sql` is new. Existing databases that have migrations 001 and 002 recorded must apply migration 003 once before using these endpoints. Do not rerun 001 or 002.
+
+## Phase 5 — Project execution and certificates (reduced scope)
+
+All endpoints are under `/api/projects` unless stated otherwise.
+
+| Method | Path | Role | Purpose |
+|---|---|---|---|
+| GET | `/mine` | leader | List projects owned by the leader, including milestones |
+| POST | `/:id/milestones` | leader | Add a milestone with optional HTTPS proof links |
+| POST | `/:id/submit-completion` | leader | Submit final report, proof links and optional demo URL |
+| GET | `/university/review-queue` | university_admin | List completion submissions for the admin's university |
+| POST | `/:id/completion-decision` | university_admin | Approve or reopen; reopening requires feedback |
+| GET | `/certificates/mine` | leader | List certificates for all team members |
+| GET | `/certificates/verify/:code` | public | Verify a certificate by its 64-character code |
+| GET | `/certificates/:code/pdf` | public | Download the generated PDF |
+
+Certificate records are created for every team member only after the owning university admin approves completion. The PDF is generated on demand by the Node.js backend; no PDF file is persisted. Sponsorship, company gallery and email delivery are intentionally deferred.
+
+---
+
+## Phase 6 — AI-Assisted Domain Classification & Difficulty Prediction
+
+All endpoints are mounted under `/api/ai`.
+
+| Method | Path | Role | Purpose |
+|---|---|---|---|
+| GET | `/problems/:id/domain` | platform_admin | Retrieve AI domain suggestion, explanation, and status for a problem |
+| POST | `/problems/:id/domain/review` | platform_admin | Accept or override AI domain suggestion (`{ action: 'accept' \| 'override', overrideDomainId?: number }`) |
+| GET | `/problems/:id/difficulty` | university_admin, platform_admin | Retrieve AI difficulty prediction, explanation, and status for a problem |
+| POST | `/problems/:id/difficulty/review` | university_admin, platform_admin | Accept or override AI difficulty prediction (`{ action: 'accept' \| 'override', overrideDifficulty?: 'small' \| 'medium' \| 'hard' }`) |
+| POST | `/jobs/run` | platform_admin | Manually process a batch of pending AI jobs |
+| POST | `/problems/:id/re-enqueue` | platform_admin | Re-enqueue AI classification and difficulty jobs for a problem |
+
+AI processing runs asynchronously in a database-backed worker (`ai_jobs`). Citizen problem submission saves immediately and is never blocked by external LLM provider calls. PII is sanitized prior to LLM calls. Human review is mandatory and authoritative; AI suggestions never automatically finalize classifications.
+
