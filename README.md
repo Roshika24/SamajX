@@ -99,6 +99,23 @@ npm run build
 
 The backend unit suite does not replace a live PostgreSQL integration test or browser end-to-end test. Those should be run against a backed-up development database before deployment.
 
+## Civic UI/UX Design System & Demo Data
+
+SamajX features a complete, high-trust civic tech frontend UI/UX overhaul:
+- **Design System Tokens**: Deep Slate (`#0F172A`), Civic Navy, Emerald (`#10B981`), Amber (`#F59E0B`), Inter typography, responsive card layouts, and subtle keyframe micro-interactions.
+- **Portals**:
+  - **Citizen Space**: Guided issue reporting with interactive location picker, priority badges, community problem feed, and status tracking.
+  - **Student Leader Workspace**: Team proposal builder, active project task tracking, milestone proof uploads, and certificate gallery.
+  - **University Admin Workspace**: Leader vetting, departmental routing, multi-factor proposal scoring & ranking, and completion sign-offs.
+  - **Platform Admin Console**: Campus verification queues, community flag moderation, and **Lifecycle Workflows & AI Review** (`/admin/platform/workflows`).
+  - **Public Space**: High-impact landing page with problem lifecycle storytelling, authenticated certificate verification (`/verify/:code`).
+- **Demo Seed Data**: Run `npm --prefix server run seed:demo` to seed 12 realistic civic challenges across all statuses (`open_for_applications`, `reported`, `in_progress`, `completed`) with pre-configured demo test accounts:
+  - **Platform Admin**: `admin@civicpulse.local` / `admin123`
+  - **University Admin**: `uniadmin@delhi.edu` / `password123`
+  - **Student Leader**: `leader@delhi.edu` / `password123`
+  - **Citizen**: `citizen@example.com` / `password123`
+  - **Corporate Sponsor**: `sponsor@techcorp.in` / `password123`
+
 ## Production configuration
 
 Set `NODE_ENV=production`, `DATABASE_URL`, a unique `JWT_SECRET` of at least 32 characters, and the exact frontend `CORS_ORIGIN` (scheme + host + optional port; no wildcard or path). Set `ADMIN_EMAIL` and a strong `ADMIN_PASSWORD` before running the production seed script. The server fails fast when required production security settings are missing or malformed.

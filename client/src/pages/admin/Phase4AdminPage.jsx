@@ -199,13 +199,13 @@ export default function Phase4AdminPage() {
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
             <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary)' }}>
-              CORE PLATFORM PIPELINE
+              CIVIC WORKFLOWS & AI PIPELINE
             </span>
             <Badge variant="primary">{problems.length} Problems</Badge>
             <Badge variant="neutral">{apps.length} Proposals</Badge>
           </div>
           <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, color: 'var(--color-ink)', margin: '0 0 6px 0' }}>
-            Classification, AI Review & Selection
+            Lifecycle Workflows & AI Review
           </h1>
           <p style={{ color: 'var(--color-ink-light)', fontSize: 'var(--text-base)', margin: 0 }}>
             Audit AI domain suggestions, verify problem classifications, score eligible student proposals, and activate project deployments.

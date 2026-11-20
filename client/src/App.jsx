@@ -24,7 +24,7 @@ import LeaderTeamPage from './pages/leader/TeamPage';
 import LeaderProblemsPage from './pages/leader/LeaderProblemsPage';
 import LeaderApplicationsPage from './pages/leader/LeaderApplicationsPage';
 import UniversityProblemsPage from './pages/university/UniversityProblemsPage';
-import Phase4AdminPage from './pages/admin/Phase4AdminPage';
+import LifecycleWorkflowsPage from './pages/admin/LifecycleWorkflowsPage';
 import LeaderProjectsPage from './pages/leader/LeaderProjectsPage';
 import LeaderCertificatesPage from './pages/leader/LeaderCertificatesPage';
 import UniversityCompletionPage from './pages/university/UniversityCompletionPage';
@@ -186,8 +186,8 @@ export default function App() {
         <Route element={<ProtectedRoute requiredRole="platform_admin"><PlatformAdminLayout /></ProtectedRoute>}>
           <Route path="/admin/platform" element={<PlatformAdminDashboard />} />
           <Route path="/admin/platform/universities" element={<PlatformAdminDashboard />} />
-          <Route path="/admin/platform/workflows" element={<Phase4AdminPage />} />
-          <Route path="/admin/platform/phase4" element={<Phase4AdminPage />} />
+          <Route path="/admin/platform/workflows" element={<LifecycleWorkflowsPage />} />
+          <Route path="/admin/platform/phase4" element={<LifecycleWorkflowsPage />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
