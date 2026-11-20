@@ -156,7 +156,7 @@ config.validateRuntime = function validateRuntime() {
     const corsOrigin = process.env.CORS_ORIGIN.trim();
     let origin;
     try { origin = new URL(corsOrigin); } catch { throw new Error('CORS_ORIGIN must be a valid absolute URL'); }
-    if (!['https:', 'http:'].includes(origin.protocol) || origin.origin !== corsOrigin.replace(/\/$/, '')) {
+    if (!['https:', 'http:'].includes(origin.protocol) || origin.origin !== corsOrigin.replace(/\/$/, '').toLowerCase()) {
       throw new Error('CORS_ORIGIN must contain one origin only (scheme + host + optional port)');
     }
   }
