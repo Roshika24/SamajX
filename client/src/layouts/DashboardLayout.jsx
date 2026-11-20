@@ -30,7 +30,7 @@ export default function DashboardLayout({ navItems = [], title = '' }) {
   const userInitial = (user?.display_name || user?.email || 'U').charAt(0).toUpperCase();
 
   return (
-    <div className={styles.layout}>
+    <div className={`${styles.layout} ${(user?.role === 'leader' || user?.role === 'citizen') ? styles.studentTheme : styles.adminTheme}`}>
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           {navItems.length > 0 && (

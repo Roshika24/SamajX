@@ -310,3 +310,28 @@
   margin: 0 auto;
 }
 
+/* Scoped Student / Normal Theme (Playful Pokémon Ambiance) */
+.studentTheme .roleBadge {
+  background: var(--jiggly-pink-pastel);
+  color: var(--jiggly-pink-deep);
+  border-color: var(--jiggly-border);
+}
+
+.studentTheme .navLinkActive {
+  background: var(--jiggly-pink-light) !important;
+  color: var(--jiggly-pink-deep) !important;
+  border: 1px solid var(--jiggly-border-subtle);
+}
+
+.studentTheme .navLinkActive .navDot {
+  background: var(--jiggly-pink-deep) !important;
+}
+
+.studentTheme .main {
+  background-color: var(--meadow-cream);
+}
+
+/* Strictly Professional Admin Theme (Clean, Minimal, High Contrast) */
+.adminTheme .main {
+  background-color: #F8FAFC;
+}
