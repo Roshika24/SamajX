@@ -1,4 +1,4 @@
-# CivicPulse — Specification
+# SamajX — Specification
 
 > A university-linked civic problem-to-solution platform.
 

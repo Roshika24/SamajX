@@ -2,7 +2,7 @@
 
 ## Scope
 
-This pass starts from the originally uploaded `CivicPulse_Routing_Repair(1).zip`. It preserves the five-role model and the existing PostgreSQL schema/migrations. It does not implement later product phases such as citizen reporting, routing, applications, project execution, certificates or sponsorship.
+This pass starts from the originally uploaded `SamajX_Routing_Repair(1).zip`. It preserves the five-role model and the existing PostgreSQL schema/migrations. It does not implement later product phases such as citizen reporting, routing, applications, project execution, certificates or sponsorship.
 
 ## Changes in this clean pass
 

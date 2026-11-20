@@ -11,9 +11,9 @@ const originalEnv = {
 };
 process.env.NODE_ENV = 'production';
 process.env.PORT = '3001';
-process.env.DATABASE_URL = 'postgresql://user:pass@localhost:5432/civicpulse';
+process.env.DATABASE_URL = 'postgresql://user:pass@localhost:5432/SamajX';
 process.env.JWT_SECRET = 'a-production-secret-that-is-at-least-32-characters';
-process.env.CORS_ORIGIN = 'https://civicpulse.example.com';
+process.env.CORS_ORIGIN = 'https://SamajX.example.com';
 
 const originalLoad = Module._load;
 Module._load = function (request, parent, isMain) {

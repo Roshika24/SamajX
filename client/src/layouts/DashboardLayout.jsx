@@ -21,7 +21,7 @@ export default function DashboardLayout({ navItems = [], title = '' }) {
       <header className={styles.header}>
         <Link to="/" className={styles.logo}>
           <span className={styles.logoIcon}>⚡</span>
-          CivicPulse
+          SamajX
         </Link>
         <div className={styles.headerRight}>
           <span className={styles.userName}>{user?.display_name}</span>

@@ -1,4 +1,4 @@
-# CivicPulse — Decisions Log
+# SamajX — Decisions Log
 
 Every design decision, deviation from the prompt, and ambiguity resolution is recorded here.
 Read this at the start of every session.
@@ -78,7 +78,7 @@ Read this at the start of every session.
 **Reason**: The prompt says "re-check difficulty" — the admin still has final say.
 
 ### D-018: Project name
-**Decision**: The project is called "CivicPulse."
+**Decision**: The project is called "SamajX."
 **Reason**: Captures the civic + community heartbeat theme. Short, memorable, domain-available-ish.
 
 ### D-019: bcryptjs instead of bcrypt

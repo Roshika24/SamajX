@@ -1,4 +1,4 @@
-# CivicPulse — Design System
+# SamajX — Design System
 
 Visual reference: the "Design Hub / Design Summit" editorial style — bold purple panels,
 bright yellow diagonal swooshes, white floating cards, expressive serif headlines,

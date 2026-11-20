@@ -1,4 +1,4 @@
-# CivicPulse — API Reference
+# SamajX — API Reference
 
 All endpoints return JSON. Standard response shape:
 

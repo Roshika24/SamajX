@@ -8,7 +8,7 @@ export default function PublicLayout() {
         <nav className={styles.nav}>
           <Link to="/" className={styles.logo}>
             <span className={styles.logoIcon}>⚡</span>
-            CivicPulse
+            SamajX
           </Link>
           <div className={styles.links}>
             <Link to="/login">Log in</Link>

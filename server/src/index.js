@@ -1,5 +1,5 @@
 /**
- * CivicPulse — Express entry point.
+ * SamajX — Express entry point.
  *
  * Wires up all global middleware, mounts module routers, and starts the server.
  */
@@ -76,43 +76,43 @@ if (require.main === module) {
   config.validateRuntime();
   const app = createApp();
   const server = app.listen(config.server.port, () => {
-    console.log(`[CivicPulse] Server running on http://localhost:${config.server.port} (${config.server.env})`);
+    console.log(`[SamajX] Server running on http://localhost:${config.server.port} (${config.server.env})`);
   });
   // Retry-safe lifecycle worker. PostgreSQL advisory locks make concurrent
   // workers across multiple server instances safe.
   const phase4Jobs = require('./modules/applications/application.logic');
   const lifecycleTimer = setInterval(() => {
     phase4Jobs.runLifecycleJobs().catch((err) => {
-      console.error('[CivicPulse] Phase 4 lifecycle job failed:', err.message);
+      console.error('[SamajX] Phase 4 lifecycle job failed:', err.message);
     });
   }, 60 * 1000);
   lifecycleTimer.unref();
   phase4Jobs.runLifecycleJobs().catch((err) => {
-    console.error('[CivicPulse] Initial Phase 4 lifecycle job failed:', err.message);
+    console.error('[SamajX] Initial Phase 4 lifecycle job failed:', err.message);
   });
 
   // Phase 6: AI asynchronous background job runner
   const aiWorker = require('./modules/ai/ai.worker');
   const aiTimer = setInterval(() => {
     aiWorker.runAIWorker({ batchSize: 5 }).catch((err) => {
-      console.error('[CivicPulse] AI worker background job failed:', err.message);
+      console.error('[SamajX] AI worker background job failed:', err.message);
     });
   }, 30 * 1000);
   aiTimer.unref();
   aiWorker.runAIWorker({ batchSize: 5 }).catch((err) => {
-    console.error('[CivicPulse] Initial AI worker job run failed:', err.message);
+    console.error('[SamajX] Initial AI worker job run failed:', err.message);
   });
 
   const pool = require('./db/pool');
   const shutdown = (signal) => {
-    console.log(`[CivicPulse] ${signal} received; shutting down`);
+    console.log(`[SamajX] ${signal} received; shutting down`);
     clearInterval(lifecycleTimer);
     clearInterval(aiTimer);
     server.close(async () => {
       try {
         await pool.end();
       } catch (err) {
-        console.error('[CivicPulse] Error while closing database pool:', err.message);
+        console.error('[SamajX] Error while closing database pool:', err.message);
         process.exitCode = 1;
       }
     });

@@ -1,4 +1,4 @@
-# CivicPulse Phase 4 — implementation and rollout
+# SamajX Phase 4 — implementation and rollout
 
 ## Included workflows
 

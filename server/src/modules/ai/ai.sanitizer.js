@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * PII Sanitizer for CivicPulse AI Layer.
+ * PII Sanitizer for SamajX AI Layer.
  *
  * Removes personally identifiable information (PII) before passing
  * citizen-submitted problem text to external AI providers.

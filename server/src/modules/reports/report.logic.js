@@ -43,7 +43,7 @@ async function createReport(userId, input) {
     await client.query('BEGIN');
     // Serialize duplicate decisions to prevent two simultaneous first reports
     // from creating separate canonical problems in the same category.
-    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`civicpulse-report:${input.category.toLowerCase()}`]);
+    await client.query('SELECT pg_advisory_xact_lock(hashtext($1))', [`SamajX-report:${input.category.toLowerCase()}`]);
     const domain = await findDomain(client, input.category);
     const radius = Number(domain.merge_radius_m) || 500;
     const { rows: candidates } = await client.query(

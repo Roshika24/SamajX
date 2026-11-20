@@ -4,7 +4,7 @@ function pdfEscape(value) {
 }
 function makeCertificatePdf(certificate, verifyUrl) {
   const lines = [
-    'CIVICPULSE', 'CERTIFICATE OF CIVIC IMPACT',
+    'SamajX', 'CERTIFICATE OF CIVIC IMPACT',
     `This certifies that ${certificate.member_name}`,
     `of ${certificate.team_name}, ${certificate.university_name}`,
     'successfully completed the civic project:', certificate.problem_title,

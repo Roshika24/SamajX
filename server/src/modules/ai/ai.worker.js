@@ -226,7 +226,7 @@ async function runAIWorker(options = {}) {
 function triggerAIWorker() {
   setImmediate(() => {
     runAIWorker({ batchSize: 5 }).catch((err) => {
-      console.error('[CivicPulse AI Worker] Background processing error:', err.message);
+      console.error('[SamajX AI Worker] Background processing error:', err.message);
     });
   });
 }

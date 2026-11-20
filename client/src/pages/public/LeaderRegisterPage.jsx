@@ -24,7 +24,7 @@ export default function LeaderRegisterPage() {
 
   return <div className={styles.page}>
     <Card className={styles.card} variant="elevated">
-      <p className="eyebrow">CIVICPULSE · TEAM LEADERS</p>
+      <p className="eyebrow">SamajX · TEAM LEADERS</p>
       <h2 className={styles.title}>Bring your team to the <span style={{ color: 'var(--color-purple)' }}>starting line.</span></h2>
       <p className={styles.subtitle}>Use your university's active promo code. Your university admin will approve your account before you can create a team.</p>
       {error && <div className={styles.error} role="alert">{error}</div>}

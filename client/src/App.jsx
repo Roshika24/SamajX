@@ -36,7 +36,7 @@ import CompanyDashboard from './pages/company/CompanyDashboard';
 import PlatformAdminDashboard from './pages/admin/PlatformAdminDashboard';
 
 function LoadingScreen() {
-  return <div role="status" aria-live="polite" style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}><p>Loading CivicPulse…</p></div>;
+  return <div role="status" aria-live="polite" style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}><p>Loading SamajX…</p></div>;
 }
 
 function ProtectedRoute({ children, requiredRole }) {

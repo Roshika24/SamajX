@@ -39,7 +39,7 @@ export default function LoginPage() {
     <div className={styles.page}>
       <Card className={styles.card} variant="elevated">
         <h2 className={styles.title}>Welcome back</h2>
-        <p className={styles.subtitle}>Log in to your CivicPulse account</p>
+        <p className={styles.subtitle}>Log in to your SamajX account</p>
 
         {error && <div className={styles.error} role="alert">{error}</div>}
 

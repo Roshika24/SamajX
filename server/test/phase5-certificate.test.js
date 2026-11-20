@@ -8,7 +8,7 @@ test('certificate PDF has a valid PDF header, xref and trailer', () => {
     university_name: 'GLA University', problem_title: 'Drainage repair',
     solution_type: 'pilot', issued_at: new Date('2026-11-18T00:00:00Z'),
     verification_code: 'a'.repeat(64),
-  }, 'https://civicpulse.example/verify/' + 'a'.repeat(64));
+  }, 'https://SamajX.example/verify/' + 'a'.repeat(64));
   const text = pdf.toString('ascii');
   assert.ok(text.startsWith('%PDF-1.4'));
   assert.ok(text.includes('xref'));

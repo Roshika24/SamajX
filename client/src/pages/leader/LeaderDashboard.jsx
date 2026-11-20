@@ -65,7 +65,7 @@ export default function LeaderDashboard() {
   if (!profile && !error) return <p>Loading your team space…</p>;
   return <div style={{ display: 'grid', gap: 22 }}>
     <div>
-      <p className="eyebrow">YOUR CIVICPULSE SPACE</p>
+      <p className="eyebrow">YOUR SamajX SPACE</p>
       <h1 style={{ marginBottom: 4 }}>Hey, {profile?.display_name || 'team leader'} ✨</h1>
       <p style={{ color: 'var(--color-ink-muted)' }}>Small steps, real-world impact. Your team's journey starts here.</p>
     </div>

@@ -1,8 +1,8 @@
-# CivicPulse Phase 4 Integration Audit — 2026-11-14
+# SamajX Phase 4 Integration Audit — 2026-11-14
 
 ## Source reconciliation
-- Base: CivicPulse_Phase4_Implementation_CrossChecked.zip
-- Overlay: CivicPulse_Routing_Skill_Matching_Update.zip
+- Base: SamajX_Phase4_Implementation_CrossChecked.zip
+- Overlay: SamajX_Routing_Skill_Matching_Update.zip
 - The routing archive differs from the Phase 4 base in the routing-related application logic, report logic, team logic, university logic, Phase 4 admin routes/UI, leader dashboard, Phase 4 tests, README/progress docs, and adds migration 005 plus reports/problemRouting.js and routing documentation.
 - The merged source retains the Phase 4 pages and API registration from the CrossChecked base and applies the routing overlay.
 

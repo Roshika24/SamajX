@@ -2,7 +2,7 @@ import Card from '../components/Card';
 import EmptyState from '../components/EmptyState';
 
 /** Shared, honest empty state for routes whose API workflow is not implemented yet. */
-export default function FeaturePage({ eyebrow = 'CIVICPULSE', title, description, nextStep }) {
+export default function FeaturePage({ eyebrow = 'SamajX', title, description, nextStep }) {
   return (
     <div style={{ display: 'grid', gap: 18, maxWidth: 900 }}>
       <div>

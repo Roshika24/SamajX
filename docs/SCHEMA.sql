@@ -1,4 +1,4 @@
--- CivicPulse — Full Database Schema
+-- SamajX — Full Database Schema
 -- Migration: 001_initial.sql
 -- Run via the migration runner script.
 

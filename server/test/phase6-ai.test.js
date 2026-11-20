@@ -204,11 +204,11 @@ test('predictProblemDifficulty sanitizes input, invokes provider, and validates 
 
   const result = await predictProblemDifficulty({
     title: 'Water Level Alert Prototype',
-    description: 'Send test queries to dev@civicpulse.org for schematics.',
+    description: 'Send test queries to dev@SamajX.org for schematics.',
     providerFn: mockProvider,
   });
 
   assert.equal(result.difficulty, 'medium');
   assert.ok(result.explanation.includes('microcontroller'));
-  assert.ok(!receivedPrompt.includes('dev@civicpulse.org'), 'Email must be redacted before sending to LLM');
+  assert.ok(!receivedPrompt.includes('dev@SamajX.org'), 'Email must be redacted before sending to LLM');
 });

@@ -1,5 +1,5 @@
 /**
- * Thin fetch wrapper for CivicPulse API.
+ * Thin fetch wrapper for SamajX API.
  *
  * - Always sends/receives JSON
  * - Always includes cookies (credentials: 'include')

@@ -33,7 +33,7 @@ const reportSchema = z.object({
   photos: z.array(z.string().max(2000).refine((value) => {
     if (/^\/uploads\/[a-f0-9-]{36}\.(jpg|png)$/i.test(value)) return true;
     try { return new URL(value).protocol === 'https:'; } catch { return false; }
-  }, 'Photo links must use HTTPS or a CivicPulse uploaded-photo URL')).max(config.uploads.maxPhotosPerReport).default([]),
+  }, 'Photo links must use HTTPS or a SamajX uploaded-photo URL')).max(config.uploads.maxPhotosPerReport).default([]),
   anonymous: z.boolean().default(false),
 });
 

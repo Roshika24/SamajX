@@ -9,7 +9,7 @@ export default function LandingPage() {
           Report it. <span className={styles.accent}>Solve it.</span> Together.
         </h1>
         <p className={styles.subtext}>
-          CivicPulse connects citizens with university teams to tackle local
+          SamajX connects citizens with university teams to tackle local
           problems — from potholes to public health.
         </p>
         <div className={styles.cta}>

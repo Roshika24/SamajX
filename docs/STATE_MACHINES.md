@@ -1,4 +1,4 @@
-# CivicPulse — State Machines
+# SamajX — State Machines
 
 All state machines are enforced by a **single central module** (`server/lib/stateMachine.js`).
 For every transition the module checks:

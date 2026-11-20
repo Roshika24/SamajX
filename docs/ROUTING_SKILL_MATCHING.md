@@ -1,4 +1,4 @@
-# CivicPulse — skill-based, distance-independent routing
+# SamajX — skill-based, distance-independent routing
 
 ## What changed
 

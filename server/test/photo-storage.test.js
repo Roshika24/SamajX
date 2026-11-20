@@ -42,7 +42,7 @@ test('savePhoto writes sanitized files with generated names', async (t) => {
   const os = require('node:os');
   const path = require('node:path');
   const { savePhoto } = require('../src/modules/reports/photoStorage');
-  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'civicpulse-photo-'));
+  const directory = await fs.mkdtemp(path.join(os.tmpdir(), 'SamajX-photo-'));
   t.after(() => fs.rm(directory, { recursive: true, force: true }));
   const jpeg = Buffer.concat([
     Buffer.from([0xff, 0xd8]),

@@ -27,7 +27,7 @@ export function AuthProvider({ children }) {
       if (err.status === 401) {
         setUser(null);
       } else {
-        setSessionError('CivicPulse could not verify your session. Check your connection and try again.');
+        setSessionError('SamajX could not verify your session. Check your connection and try again.');
       }
     } finally {
       setLoading(false);

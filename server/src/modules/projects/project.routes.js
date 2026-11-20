@@ -97,6 +97,6 @@ router.get('/certificates/:code/pdf',async(req,res,next)=>{try{
  const {rows}=await pool.query(`SELECT c.*,p.status project_status FROM certificates c JOIN projects p ON p.id=c.project_id WHERE c.verification_code=$1 AND p.status='completed'`,[code]);
  if(!rows[0])throw new NotFoundError('Certificate');
  const pdf=makeCertificatePdf(rows[0],`${req.protocol}://${req.get('host')}/verify/${code}`);
- res.set({'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="CivicPulse-${code.slice(0,12)}.pdf"`,'Content-Length':pdf.length});res.send(pdf);
+ res.set({'Content-Type':'application/pdf','Content-Disposition':`attachment; filename="SamajX-${code.slice(0,12)}.pdf"`,'Content-Length':pdf.length});res.send(pdf);
 }catch(e){next(e)}});
 module.exports=router;

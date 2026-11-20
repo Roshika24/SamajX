@@ -1,4 +1,4 @@
-# CivicPulse Phase 3 — implementation checks
+# SamajX Phase 3 — implementation checks
 
 Date: 2026-11-14
 

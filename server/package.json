@@ -1,7 +1,7 @@
 {
-  "name": "civicpulse-server",
+  "name": "SamajX-server",
   "version": "0.1.0",
-  "description": "CivicPulse API server \u2014 civic problem-to-solution platform",
+  "description": "SamajX API server \u2014 civic problem-to-solution platform",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

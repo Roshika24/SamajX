@@ -59,7 +59,7 @@ export default function RegisterPage() {
     <div className={styles.page}>
       <Card className={styles.card} variant="elevated">
         <h2 className={styles.title}>Create your account</h2>
-        <p className={styles.subtitle}>Join CivicPulse and start making a difference</p>
+        <p className={styles.subtitle}>Join SamajX and start making a difference</p>
 
         {/* Role selector tabs */}
         <div className={styles.roleTabs}>

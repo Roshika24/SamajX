@@ -1,5 +1,5 @@
 /**
- * CivicPulse — Centralised configuration.
+ * SamajX — Centralised configuration.
  *
  * Every tuneable value lives here so nothing is hardcoded in business logic.
  * Values come from environment variables with sensible defaults.
@@ -19,7 +19,7 @@ const config = {
   db: {
     connectionString:
       process.env.DATABASE_URL ||
-      'postgresql://postgres:postgres@localhost:5432/civicpulse',
+      'postgresql://postgres:postgres@localhost:5432/SamajX',
   },
 
   /* ── JWT / Auth ── */
@@ -55,7 +55,7 @@ const config = {
     port: parseInt(process.env.SMTP_PORT || '587', 10),
     user: process.env.SMTP_USER || '',
     pass: process.env.SMTP_PASS || '',
-    from: process.env.EMAIL_FROM || 'noreply@civicpulse.local',
+    from: process.env.EMAIL_FROM || 'noreply@SamajX.local',
   },
 
   /* ── Rate limiting ── */
@@ -127,7 +127,7 @@ const config = {
 
   /* ── Admin bootstrap ── */
   admin: {
-    email: (process.env.ADMIN_EMAIL || 'admin@civicpulse.local').trim().toLowerCase(),
+    email: (process.env.ADMIN_EMAIL || 'admin@SamajX.local').trim().toLowerCase(),
     password: process.env.ADMIN_PASSWORD || 'admin123',
   },
 

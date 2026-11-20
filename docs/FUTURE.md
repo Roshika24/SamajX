@@ -1,4 +1,4 @@
-# CivicPulse — Future Ideas
+# SamajX — Future Ideas
 
 Ideas that are out of scope for the current phase plan but worth considering later.
 

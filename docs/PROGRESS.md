@@ -1,4 +1,4 @@
-# CivicPulse — Progress Tracker
+# SamajX — Progress Tracker
 
 Read this at the start of every session alongside SPEC.md and DECISIONS.md.
 
