@@ -174,13 +174,13 @@ export default function LeaderDashboard() {
             <div className={styles.trainerBadgeRow}>
               <span className={styles.trainerPill}>
                 <span>🌟</span>
-                <span>TRAINER LEVEL: {profile?.verified ? 'VERIFIED SQUAD' : 'ROOKIE SQUAD'}</span>
+                <span>SQUAD STATUS: {profile?.verified ? 'VERIFIED' : 'ROOKIE'}</span>
               </span>
               <Badge variant="primary">{team?.name || 'No Squad Formed'}</Badge>
             </div>
 
             <h1 className={styles.welcomeTitle}>
-              Welcome back, <span className={styles.welcomeTitleHighlight}>{profile?.display_name || 'Trainer'}!</span> 👋
+              Hey, <span className={styles.welcomeTitleHighlight}>{profile?.display_name || 'Team Leader'}!</span> 👋
             </h1>
 
             <p className={styles.welcomeSubtitle}>
@@ -518,7 +518,7 @@ export default function LeaderDashboard() {
               <JigglypuffMascot variant="celebrate" size="small" showShadow={false} />
               <div>
                 <div style={{ fontSize: 'var(--text-xs)', fontWeight: 700, color: '#059669', textTransform: 'uppercase' }}>
-                  CONGRATULATIONS, TRAINER!
+                  CONGRATULATIONS, SQUAD!
                 </div>
                 <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 800, color: 'var(--jiggly-text)', margin: '2px 0 0 0' }}>
                   You have {certificates.length} Cryptographically Verified Certificate{certificates.length > 1 ? 's' : ''}!

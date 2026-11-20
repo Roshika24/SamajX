@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import JigglypuffMascot from '../../components/JigglypuffMascot';
 import { useAuth } from '../../contexts/AuthContext';
 import styles from './RegisterPage.module.css';
 
@@ -26,6 +27,9 @@ export default function LeaderRegisterPage() {
     <div className={styles.page}>
       <Card className={styles.card} padding="none">
         <div className={styles.headerArea}>
+          <div className={styles.mascotWrap}>
+            <JigglypuffMascot variant="idle" size="small" showShadow={false} />
+          </div>
           <p className="eyebrow">ACADEMIC INNOVATION · STUDENT HUB</p>
           <h2 className={styles.title}>Register as Team Leader</h2>
           <p className={styles.subtitle}>
@@ -36,7 +40,7 @@ export default function LeaderRegisterPage() {
         {error && <div className={styles.error} role="alert">{error}</div>}
 
         <form onSubmit={submit} className={styles.form}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
             <div className={styles.field}>
               <label htmlFor="display_name">Full Name</label>
               <input id="display_name" name="display_name" type="text" value={form.display_name} onChange={change} required placeholder="Student Leader Name" />
@@ -47,7 +51,7 @@ export default function LeaderRegisterPage() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
             <div className={styles.field}>
               <label htmlFor="password">Password (8+ characters)</label>
               <input id="password" name="password" type="password" value={form.password} onChange={change} required minLength={8} placeholder="••••••••" />
@@ -58,27 +62,30 @@ export default function LeaderRegisterPage() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 'var(--space-4)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 'var(--space-4)' }}>
             <div className={styles.field}>
-              <label htmlFor="enrollment_number">Enrollment / Roll No.</label>
-              <input id="enrollment_number" name="enrollment_number" type="text" value={form.enrollment_number} onChange={change} required placeholder="e.g. 21BCE0456" />
+              <label htmlFor="enrollment_number">Roll / Student ID (optional)</label>
+              <input id="enrollment_number" name="enrollment_number" type="text" value={form.enrollment_number} onChange={change} placeholder="e.g. 2024-CS-042" />
             </div>
             <div className={styles.field}>
-              <label htmlFor="branch">Department / Branch</label>
-              <input id="branch" name="branch" type="text" value={form.branch} onChange={change} required placeholder="e.g. Computer Engineering" />
-            </div>
-            <div className={styles.field}>
-              <label htmlFor="year">Current Year</label>
-              <select id="year" name="year" value={form.year} onChange={change}>
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <option key={n} value={n}>Year {n}</option>
-                ))}
-              </select>
+              <label htmlFor="branch">Engineering Department</label>
+              <input id="branch" name="branch" type="text" value={form.branch} onChange={change} placeholder="e.g. Computer Science / Civil" />
             </div>
           </div>
 
+          <div className={styles.field}>
+            <label htmlFor="year">Academic Year</label>
+            <select id="year" name="year" value={form.year} onChange={change}>
+              <option value="1">1st Year (Freshman)</option>
+              <option value="2">2nd Year (Sophomore)</option>
+              <option value="3">3rd Year (Junior)</option>
+              <option value="4">4th Year (Senior)</option>
+              <option value="5">5th Year (Postgraduate)</option>
+            </select>
+          </div>
+
           <Button type="submit" loading={loading} className={styles.submitBtn}>
-            Create Leader Account
+            Register Squad Leader
           </Button>
         </form>
 

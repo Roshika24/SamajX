@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import JigglypuffMascot from '../../components/JigglypuffMascot';
 import styles from './RegisterPage.module.css';
 import { api } from '../../utils/api';
 import LocationPicker from '../../components/LocationPicker';
@@ -59,6 +60,9 @@ export default function RegisterPage() {
     <div className={styles.page}>
       <Card className={styles.card} padding="none">
         <div className={styles.headerArea}>
+          <div className={styles.mascotWrap}>
+            <JigglypuffMascot variant="idle" size="small" showShadow={false} />
+          </div>
           <p className="eyebrow">COMMUNITY ONBOARDING</p>
           <h2 className={styles.title}>Create your account</h2>
           <p className={styles.subtitle}>Join SamajX and start building civic solutions</p>

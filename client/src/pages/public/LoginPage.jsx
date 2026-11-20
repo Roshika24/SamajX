@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Button from '../../components/Button';
 import Card from '../../components/Card';
+import JigglypuffMascot from '../../components/JigglypuffMascot';
 import styles from './LoginPage.module.css';
 
 export default function LoginPage() {
@@ -19,7 +20,6 @@ export default function LoginPage() {
     setLoading(true);
     try {
       const user = await login(email, password);
-      // Redirect based on role
       const routes = {
         citizen: '/citizen',
         leader: '/leader',
@@ -39,6 +39,9 @@ export default function LoginPage() {
     <div className={styles.page}>
       <Card className={styles.card} padding="none">
         <div className={styles.headerArea}>
+          <div className={styles.mascotWrap}>
+            <JigglypuffMascot variant="idle" size="small" showShadow={false} />
+          </div>
           <p className="eyebrow">PORTAL AUTHENTICATION</p>
           <h2 className={styles.title}>Welcome back</h2>
           <p className={styles.subtitle}>Sign in to your SamajX civic workspace</p>
