@@ -1,124 +1,181 @@
 .page {
-  min-height: calc(100vh - 72px);
+  min-height: calc(100vh - 65px);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--space-8);
-  background: var(--color-gray-50);
+  padding: var(--space-8) var(--space-4);
+  background: radial-gradient(circle at 50% 15%, #EFF6FF 0%, #F8FAFC 70%);
 }
 
 .card {
   width: 100%;
-  max-width: 520px;
+  max-width: 640px;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-2xl);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-8);
+  animation: slideUp var(--transition-slow) ease-out;
+}
+
+.headerArea {
+  margin-bottom: var(--space-6);
+  text-align: center;
 }
 
 .title {
   font-family: var(--font-display);
   font-size: var(--text-2xl);
-  margin-bottom: var(--space-2);
+  font-weight: var(--weight-bold);
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-1);
 }
 
 .subtitle {
-  color: var(--color-ink-muted);
-  margin-bottom: var(--space-6);
+  color: var(--color-gray-500);
+  font-size: var(--text-sm);
+  margin-bottom: 0;
 }
 
 /* Role tab selector */
 .roleTabs {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 1fr;
   gap: var(--space-2);
   margin-bottom: var(--space-6);
+}
+
+@media (min-width: 600px) {
+  .roleTabs {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 .roleTab {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  padding: var(--space-3) var(--space-4);
-  border: 2px solid var(--color-gray-200);
-  border-radius: var(--radius-md);
+  gap: 4px;
+  padding: var(--space-3);
+  border: 1px solid var(--color-gray-200);
+  border-radius: var(--radius-lg);
   text-align: left;
   transition: all var(--transition-fast);
   cursor: pointer;
-  background: var(--color-white);
+  background: var(--color-gray-50);
 }
 
 .roleTab:hover {
-  border-color: var(--color-purple-light);
+  border-color: var(--color-primary-light);
+  background: var(--color-white);
 }
 
 .roleTab strong {
-  font-size: var(--text-sm);
-  color: var(--color-ink);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-bold);
+  color: var(--color-gray-800);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .roleTab span {
-  font-size: var(--text-xs);
-  color: var(--color-ink-muted);
+  font-size: var(--text-2xs);
+  color: var(--color-gray-500);
+  line-height: var(--line-normal);
 }
 
 .activeTab {
-  border-color: var(--color-purple);
-  background: var(--color-purple-bg);
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
+
+.activeTab strong {
+  color: var(--color-primary-hover) !important;
 }
 
 .error {
-  background: var(--color-error-bg);
-  color: var(--color-error);
-  padding: var(--space-3) var(--space-4);
-  border-radius: var(--radius-sm);
+  background: var(--color-danger-bg);
+  color: var(--color-danger-text);
+  border: 1px solid var(--color-danger-border);
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-md);
   font-size: var(--text-sm);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1);
+  gap: 0.35rem;
 }
 
 .field label {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  color: var(--color-gray-700);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--color-gray-300);
+  border-radius: var(--radius-lg);
   font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--color-ink-light);
+  color: var(--color-gray-900);
+  transition: all var(--transition-fast);
+  background: var(--color-white);
 }
 
-.field input {
-  padding: var(--space-3) var(--space-4);
-  border: 1px solid var(--color-gray-200);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-base);
-  transition: border-color var(--transition-fast);
-}
-
-.field input:focus {
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
   outline: none;
-  border-color: var(--color-purple);
-  box-shadow: 0 0 0 3px var(--color-purple-bg);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-bg);
 }
 
 .submitBtn {
   width: 100%;
-  margin-top: var(--space-2);
+  margin-top: var(--space-3);
 }
 
 .footer {
   text-align: center;
   margin-top: var(--space-6);
   font-size: var(--text-sm);
-  color: var(--color-ink-muted);
+  color: var(--color-gray-500);
+}
+
+.footer a {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
 }
 
 .leaderNote {
   text-align: center;
   font-size: var(--text-xs);
-  color: var(--color-ink-muted);
+  color: var(--color-gray-600);
   margin-top: var(--space-3);
+  background: var(--color-gray-50);
+  border: 1px dashed var(--color-gray-300);
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
 }
+
+.leaderNote a {
+  color: var(--color-primary);
+  font-weight: var(--weight-semibold);
+}
+

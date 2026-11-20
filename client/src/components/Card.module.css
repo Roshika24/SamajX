@@ -1,10 +1,12 @@
-/* Card — white rounded container */
+/* Card — modern clean civic container */
 .card {
   background: var(--color-white);
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-md);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
   overflow: hidden;
   position: relative;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
 }
 
 /* Padding variants */
@@ -14,8 +16,14 @@
 .pad-lg   { padding: var(--space-8); }
 
 /* Style variants */
+.default {
+  background: var(--color-white);
+  border-color: var(--color-gray-200);
+}
+
 .elevated {
-  box-shadow: var(--shadow-xl);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-gray-200);
 }
 
 .outlined {
@@ -23,22 +31,34 @@
   border: 1px solid var(--color-gray-200);
 }
 
+.interactive {
+  cursor: pointer;
+}
+
+.interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--color-primary-light);
+}
+
+.subtle {
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-200);
+  box-shadow: none;
+}
+
 .hero {
-  background: var(--color-purple);
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+  border-color: #334155;
+  color: var(--color-white);
+  box-shadow: var(--shadow-lg);
+}
+
+.hero h1, .hero h2, .hero h3, .hero h4, .hero h5, .hero h6 {
   color: var(--color-white);
 }
 
-/* Diagonal yellow swoosh on hero cards via pseudo-element */
-.hero::after {
-  content: '';
-  position: absolute;
-  bottom: -20%;
-  right: -10%;
-  width: 60%;
-  height: 60%;
-  background: var(--color-yellow);
-  transform: rotate(-12deg);
-  border-radius: var(--radius-xl);
-  opacity: 0.15;
-  pointer-events: none;
+.hero p {
+  color: #CBD5E1;
 }
+

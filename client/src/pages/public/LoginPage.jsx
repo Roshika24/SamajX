@@ -37,9 +37,12 @@ export default function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <Card className={styles.card} variant="elevated">
-        <h2 className={styles.title}>Welcome back</h2>
-        <p className={styles.subtitle}>Log in to your SamajX account</p>
+      <Card className={styles.card} padding="none">
+        <div className={styles.headerArea}>
+          <p className="eyebrow">PORTAL AUTHENTICATION</p>
+          <h2 className={styles.title}>Welcome back</h2>
+          <p className={styles.subtitle}>Sign in to your SamajX civic workspace</p>
+        </div>
 
         {error && <div className={styles.error} role="alert">{error}</div>}
 
@@ -69,13 +72,17 @@ export default function LoginPage() {
             />
           </div>
           <Button type="submit" loading={loading} className={styles.submitBtn}>
-            Log In
+            Sign In
           </Button>
         </form>
 
         <p className={styles.footer}>
-          Don&apos;t have an account? <Link to="/register">Register</Link>
+          Don&apos;t have an account? <Link to="/register">Create one</Link> · <Link to="/register/leader">Student code signup</Link>
         </p>
+
+        <div className={styles.roleHint}>
+          Supports Citizen · Student Leader · University Admin · Company · Platform Admin
+        </div>
       </Card>
     </div>
   );

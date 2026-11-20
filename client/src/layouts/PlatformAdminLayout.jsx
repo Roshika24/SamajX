@@ -1,11 +1,10 @@
 import DashboardLayout from './DashboardLayout';
 
-// Only show destinations that are implemented in Phase 2.
-// Companies, moderation, problems and audit screens belong to later phases.
+// Destinations for platform administration
 const NAV_ITEMS = [
   { to: '/admin/platform', label: 'Dashboard' },
   { to: '/admin/platform/universities', label: 'Universities' },
-  { to: '/admin/platform/phase4', label: 'Phase 4 workflows' },
+  { to: '/admin/platform/workflows', label: 'Lifecycle Workflows' },
 ];
 
 export default function PlatformAdminLayout() {

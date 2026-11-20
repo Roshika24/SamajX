@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { api } from '../../utils/api';
 import Card from '../../components/Card';
 import Button from '../../components/Button';
@@ -12,6 +13,7 @@ export default function UniversityDashboard() {
   const [problems, setProblems] = useState([]);
   const [error, setError] = useState('');
   const [busyId, setBusyId] = useState(null);
+  const [copied, setCopied] = useState(false);
 
   const refresh = useCallback(async () => {
     const result = await api.get('/universities/me');
@@ -26,70 +28,396 @@ export default function UniversityDashboard() {
     setEvidence(evidenceResult.data || []);
     setProblems(problemResult.data || []);
   }, []);
-  useEffect(() => { refresh().catch(e => setError(e.message)); }, [refresh]);
+
+  useEffect(() => {
+    refresh().catch((e) => setError(e.message));
+  }, [refresh]);
 
   async function action(path, id) {
-    setBusyId(id); setError('');
-    try { await api.patch(path, {}); await refresh(); }
-    catch (e) { setError(e.message); } finally { setBusyId(null); }
+    setBusyId(id);
+    setError('');
+    try {
+      await api.patch(path, {});
+      await refresh();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function regenerate() {
-    setBusyId('promo'); setError('');
-    try { await api.post(`/universities/${university.id}/promo-code/regenerate`, {}); await refresh(); }
-    catch (e) { setError(e.message); } finally { setBusyId(null); }
+    setBusyId('promo');
+    setError('');
+    try {
+      await api.post(`/universities/${university.id}/promo-code/regenerate`, {});
+      await refresh();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
   async function revoke() {
-    setBusyId('promo'); setError('');
-    try { await api.post(`/universities/${university.id}/promo-code/revoke`, {}); await refresh(); }
-    catch (e) { setError(e.message); } finally { setBusyId(null); }
+    setBusyId('promo');
+    setError('');
+    try {
+      await api.post(`/universities/${university.id}/promo-code/revoke`, {});
+      await refresh();
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setBusyId(null);
+    }
   }
 
-  if (!university && !error) return <p>Loading university workspace…</p>;
-  return <div style={{ display: 'grid', gap: 22 }}>
-    <div><p className="eyebrow">UNIVERSITY CONTROL ROOM</p><h1>{university?.name || 'University dashboard'}</h1><p style={{ color: 'var(--color-ink-muted)' }}>Review your student leaders, verify their credentials and keep your departments up to date.</p></div>
-    {error && <p role="alert" style={{ color: '#b42318' }}>{error}</p>}
-    <Card style={{ padding: 22 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 16, flexWrap: 'wrap' }}><div><Badge variant={university?.verified ? 'success' : 'warning'}>{university?.verified ? 'Verified university' : 'Awaiting platform verification'}</Badge><h2 style={{ margin: '12px 0 4px' }}>Your leader promo code</h2><p style={{ color: 'var(--color-ink-muted)', margin: 0 }}>Share this code only with students who should join your university.</p></div><div style={{ textAlign: 'right' }}><strong style={{ fontSize: 28, letterSpacing: 3 }}>{university?.promo_code || '—'}</strong><p style={{ fontSize: 12, color: 'var(--color-ink-muted)' }}>{university?.promo_code_join_count || 0} / {university?.promo_code_join_limit || 0} joins</p></div></div>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 14 }}><Button onClick={regenerate} loading={busyId === 'promo'}>Regenerate code</Button><Button variant="secondary" onClick={revoke} loading={busyId === 'promo'}>Revoke code</Button></div><small style={{ color: 'var(--color-ink-muted)' }}>Expires: {university?.promo_code_expires_at ? new Date(university.promo_code_expires_at).toLocaleDateString() : 'No expiry'}</small>
-    </Card>
-    <section><h2>Departments</h2><div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>{(university?.departments || []).map(d => <Badge key={d.id}>{d.name}</Badge>)}</div></section>
-    <section><h2>Leader approval queue <span style={{ color: 'var(--color-purple)' }}>({leaders.length})</span></h2>{leaders.length ? <div style={{ display: 'grid', gap: 12 }}>{leaders.map(l => <Card key={l.id} style={{ padding: 18 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}><div><strong>{l.display_name}</strong><p style={{ margin: '4px 0', color: 'var(--color-ink-muted)' }}>{l.email} · {l.enrollment_number || 'Enrollment not set'} · {l.branch || 'Branch not set'} · Year {l.year || '—'}</p></div><div style={{ display: 'flex', gap: 8 }}><Button size="sm" onClick={() => action(`/leaders/${l.id}/approve`, l.id)} loading={busyId === l.id}>Approve</Button><Button size="sm" variant="secondary" onClick={() => action(`/leaders/${l.id}/reject`, l.id)} loading={busyId === l.id}>Reject</Button></div></div></Card>)}</div> : <EmptyState title="No leaders waiting" description="New leader signups using your promo code will appear here." />}</section>
-    <section><h2>Evidence verification <span style={{ color: 'var(--color-purple)' }}>({evidence.length})</span></h2>{evidence.length ? <div style={{ display: 'grid', gap: 12 }}>{evidence.map(item => <Card key={item.id} style={{ padding: 18 }}><div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}><div><strong>{item.title}</strong><p style={{ margin: '4px 0', color: 'var(--color-ink-muted)' }}>{item.member_name} · {item.team_name} · {item.type}</p>{item.description && <p>{item.description}</p>}{item.link && <a href={item.link} target="_blank" rel="noreferrer">View evidence ↗</a>}</div><div style={{ display: 'flex', gap: 8, alignItems: 'center' }}><Button size="sm" onClick={() => action(`/evidence/${item.id}/verify`, item.id)} loading={busyId === item.id}>Verify</Button><Button size="sm" variant="secondary" onClick={() => action(`/evidence/${item.id}/reject`, item.id)} loading={busyId === item.id}>Reject</Button></div></div></Card>)}</div> : <EmptyState title="Evidence queue is clear" description="Submitted projects, hackathons, internships and faculty experience will appear here." />}</section>
-    <section>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <h2>Civic Problems & Projects <span style={{ color: 'var(--color-purple)' }}>({problems.length})</span></h2>
-        <a href="/admin/university/problems" style={{ fontSize: '0.9rem', fontWeight: 600 }}>Review in detail →</a>
+  function copyCode() {
+    if (!university?.promo_code) return;
+    navigator.clipboard.writeText(university.promo_code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  }
+
+  if (!university && !error) {
+    return (
+      <div style={{ display: 'grid', placeItems: 'center', minHeight: 260 }}>
+        <p role="status" style={{ color: 'var(--color-ink-muted)' }}>Loading university workspace…</p>
       </div>
-      <p style={{ color: 'var(--color-ink-muted)', marginTop: -6 }}>
-        All civic problems across the platform. Larger distances are labelled as <strong>Far away</strong>.
-      </p>
-      {problems.length ? (
-        <div style={{ display: 'grid', gap: 12 }}>
-          {problems.map(p => (
-            <Card key={p.id} style={{ padding: 16 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-                <div>
-                  <h3 style={{ margin: '0 0 4px 0', fontSize: '1rem' }}>#{p.id} · {p.title}</h3>
-                  <p style={{ margin: '0 0 6px 0', color: 'var(--color-ink-muted)', fontSize: '0.85rem' }}>
-                    Domain: {p.domain_name || 'Unassigned'} · Difficulty: {p.difficulty || p.ai_suggested_difficulty || 'Pending'}
-                  </p>
-                </div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-                  <Badge variant={p.distance_label === 'Far away' ? 'danger' : 'info'}>
-                    📍 {p.distance_km} km {p.distance_label === 'Far away' ? '· Far away' : '· Within range'}
-                  </Badge>
-                  <Badge variant={p.status === 'open_for_applications' ? 'success' : 'default'}>
-                    {p.status}
-                  </Badge>
-                </div>
-              </div>
-            </Card>
-          ))}
+    );
+  }
+
+  return (
+    <div style={{ display: 'grid', gap: 24, maxWidth: 1040, margin: '0 auto' }}>
+      {/* Header */}
+      <div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+          <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-primary)' }}>
+            INSTITUTIONAL ADMINISTRATION
+          </span>
+          <Badge variant={university?.verified ? 'success' : 'warning'}>
+            {university?.verified ? '✓ Verified Campus' : 'Verification In Progress'}
+          </Badge>
         </div>
-      ) : (
-        <EmptyState title="No civic problems found" description="Reported community problems will appear here." />
+        <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, color: 'var(--color-ink)', margin: '0 0 6px 0' }}>
+          {university?.name || 'University Control Room'}
+        </h1>
+        <p style={{ color: 'var(--color-ink-light)', fontSize: 'var(--text-base)', margin: 0 }}>
+          Manage campus student leaders, verify academic credential evidence, and oversee routed civic problem proposals.
+        </p>
+      </div>
+
+      {error && (
+        <div
+          role="alert"
+          style={{
+            padding: '12px 16px',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.25)',
+            borderRadius: 'var(--radius-md)',
+            color: 'var(--color-danger)',
+            fontSize: 'var(--text-sm)',
+          }}
+        >
+          {error}
+        </div>
       )}
-    </section>
-  </div>;
+
+      {/* Promo Code Management Card */}
+      <Card>
+        <div style={{ display: 'grid', gap: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <span style={{ fontSize: 'var(--text-xs)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--color-primary)' }}>
+                LEADER ONBOARDING CREDENTIAL
+              </span>
+              <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-ink)', margin: '4px 0 6px 0' }}>
+                Campus Leader Promo Code
+              </h2>
+              <p style={{ color: 'var(--color-ink-light)', fontSize: 'var(--text-sm)', margin: 0, maxWidth: 540 }}>
+                Share this secure authorization code with student leaders to grant them access to register teams under {university?.name}.
+              </p>
+            </div>
+
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12,
+                padding: '12px 18px',
+                backgroundColor: 'var(--color-surface-sunken)',
+                borderRadius: 'var(--radius-lg)',
+                border: '1px solid var(--color-border)',
+              }}
+            >
+              <div>
+                <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>Active Code</div>
+                <strong style={{ fontSize: '1.5rem', fontFamily: 'monospace', letterSpacing: '2px', color: 'var(--color-primary)' }}>
+                  {university?.promo_code || '—'}
+                </strong>
+              </div>
+              <Button size="small" variant="secondary" onClick={copyCode}>
+                {copied ? '✓ Copied' : 'Copy'}
+              </Button>
+            </div>
+          </div>
+
+          {/* Join meter and dates */}
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              flexWrap: 'wrap',
+              gap: 12,
+              paddingTop: 12,
+              borderTop: '1px solid var(--color-border)',
+              fontSize: 'var(--text-xs)',
+              color: 'var(--color-ink-muted)',
+            }}
+          >
+            <div>
+              Usage Quota: <strong>{university?.promo_code_join_count || 0}</strong> of{' '}
+              <strong>{university?.promo_code_join_limit || 0}</strong> students joined
+            </div>
+            <div>
+              Expiration:{' '}
+              {university?.promo_code_expires_at
+                ? new Date(university.promo_code_expires_at).toLocaleDateString(undefined, { dateStyle: 'medium' })
+                : 'No expiration date set'}
+            </div>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <Button size="small" variant="ghost" onClick={regenerate} loading={busyId === 'promo'}>
+                Regenerate Code
+              </Button>
+              <Button size="small" variant="ghost" onClick={revoke} loading={busyId === 'promo'} style={{ color: 'var(--color-danger)' }}>
+                Revoke Code
+              </Button>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Departments Section */}
+      <div>
+        <h2 style={{ fontSize: 'var(--text-lg)', fontWeight: 700, color: 'var(--color-ink)', marginBottom: 10 }}>
+          Registered Departments & Engineering Schools
+        </h2>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {(university?.departments || []).length ? (
+            university.departments.map((d) => (
+              <Badge key={d.id} variant="neutral">
+                🏛️ {d.name}
+              </Badge>
+            ))
+          ) : (
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)' }}>
+              No specific departments registered yet.
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Leader Approval Queue */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div>
+            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-ink)', margin: 0 }}>
+              Leader Approval Queue ({leaders.length})
+            </h2>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)', margin: '2px 0 0 0' }}>
+              Student leaders awaiting enrollment identity verification.
+            </p>
+          </div>
+        </div>
+
+        {leaders.length ? (
+          <div style={{ display: 'grid', gap: 12 }}>
+            {leaders.map((l) => (
+              <Card key={l.id}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+                  <div>
+                    <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-ink)', margin: '0 0 4px 0' }}>
+                      {l.display_name}
+                    </h3>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-light)' }}>
+                      <span>{l.email}</span> · <span>Enrollment: <strong>{l.enrollment_number || 'Not provided'}</strong></span> ·{' '}
+                      <span>Branch: <strong>{l.branch || 'Not provided'}</strong></span> · <span>Year: <strong>{l.year || '—'}</strong></span>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8 }}>
+                    <Button
+                      size="small"
+                      variant="primary"
+                      onClick={() => action(`/leaders/${l.id}/approve`, l.id)}
+                      loading={busyId === l.id}
+                    >
+                      ✓ Approve
+                    </Button>
+                    <Button
+                      size="small"
+                      variant="secondary"
+                      onClick={() => action(`/leaders/${l.id}/reject`, l.id)}
+                      loading={busyId === l.id}
+                    >
+                      Reject
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <EmptyState
+              title="No Leaders Waiting for Approval"
+              message="New student leader signups using your university promo code will appear here for verification."
+            />
+          </Card>
+        )}
+      </div>
+
+      {/* Evidence Verification Queue */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+          <div>
+            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-ink)', margin: 0 }}>
+              Evidence Verification Queue ({evidence.length})
+            </h2>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)', margin: '2px 0 0 0' }}>
+              Verify student certifications, lab experiences, and hackathon accomplishments to award XP.
+            </p>
+          </div>
+        </div>
+
+        {evidence.length ? (
+          <div style={{ display: 'grid', gap: 12 }}>
+            {evidence.map((item) => (
+              <Card key={item.id}>
+                <div style={{ display: 'grid', gap: 10 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 12 }}>
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
+                        <Badge variant="primary">{item.type?.replaceAll('_', ' ')}</Badge>
+                        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
+                          Student: <strong>{item.member_name}</strong> · Squad: <strong>{item.team_name}</strong>
+                        </span>
+                      </div>
+                      <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--color-ink)', margin: 0 }}>
+                        {item.title}
+                      </h3>
+                    </div>
+                    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                      <Button
+                        size="small"
+                        variant="primary"
+                        onClick={() => action(`/evidence/${item.id}/verify`, item.id)}
+                        loading={busyId === item.id}
+                      >
+                        ✓ Verify & Award XP
+                      </Button>
+                      <Button
+                        size="small"
+                        variant="secondary"
+                        onClick={() => action(`/evidence/${item.id}/reject`, item.id)}
+                        loading={busyId === item.id}
+                      >
+                        Reject
+                      </Button>
+                    </div>
+                  </div>
+
+                  {item.description && (
+                    <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-light)', margin: 0, lineHeight: 1.5 }}>
+                      {item.description}
+                    </p>
+                  )}
+
+                  {item.link && (
+                    <div style={{ paddingTop: 4 }}>
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noreferrer"
+                        style={{
+                          fontSize: 'var(--text-xs)',
+                          color: 'var(--color-primary)',
+                          fontWeight: 600,
+                          textDecoration: 'none',
+                        }}
+                      >
+                        🔗 View External Evidence Document ↗
+                      </a>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <EmptyState
+              title="Evidence Queue is Clear"
+              message="No student credential evidence is waiting for verification. When students submit projects or endorsements, they will appear here."
+            />
+          </Card>
+        )}
+      </div>
+
+      {/* Civic Problems Section */}
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12, marginBottom: 12 }}>
+          <div>
+            <h2 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-ink)', margin: 0 }}>
+              Civic Problems & Projects ({problems.length})
+            </h2>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-muted)', margin: '2px 0 0 0' }}>
+              Civic issues across your regional jurisdiction.
+            </p>
+          </div>
+          <Link
+            to="/admin/university/problems"
+            style={{ fontSize: 'var(--text-sm)', fontWeight: 600, color: 'var(--color-primary)', textDecoration: 'none' }}
+          >
+            Review AI Assessments & Proposals →
+          </Link>
+        </div>
+
+        {problems.length ? (
+          <div style={{ display: 'grid', gap: 12 }}>
+            {problems.slice(0, 6).map((p) => (
+              <Card key={p.id}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+                  <div>
+                    <h3 style={{ margin: '0 0 4px 0', fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--color-ink)' }}>
+                      #{p.id} · {p.title}
+                    </h3>
+                    <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-ink-muted)' }}>
+                      Domain: <strong>{p.domain_name || 'Unassigned'}</strong> · Difficulty:{' '}
+                      <strong>{p.difficulty || p.ai_suggested_difficulty || 'Pending'}</strong>
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                    <Badge variant={p.distance_label === 'Far away' ? 'warning' : 'info'}>
+                      📍 {p.distance_km} km {p.distance_label === 'Far away' ? '· Far away' : '· Within range'}
+                    </Badge>
+                    <Badge variant={p.status === 'open_for_applications' ? 'success' : 'default'}>
+                      {p.status}
+                    </Badge>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <Card>
+            <EmptyState
+              title="No Civic Problems Found"
+              message="Reported community problems routed to your jurisdiction will appear here."
+            />
+          </Card>
+        )}
+      </div>
+    </div>
+  );
 }

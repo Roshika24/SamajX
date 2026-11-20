@@ -57,9 +57,12 @@ export default function RegisterPage() {
 
   return (
     <div className={styles.page}>
-      <Card className={styles.card} variant="elevated">
-        <h2 className={styles.title}>Create your account</h2>
-        <p className={styles.subtitle}>Join SamajX and start making a difference</p>
+      <Card className={styles.card} padding="none">
+        <div className={styles.headerArea}>
+          <p className="eyebrow">COMMUNITY ONBOARDING</p>
+          <h2 className={styles.title}>Create your account</h2>
+          <p className={styles.subtitle}>Join SamajX and start building civic solutions</p>
+        </div>
 
         {/* Role selector tabs */}
         <div className={styles.roleTabs}>

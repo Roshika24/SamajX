@@ -41,4 +41,20 @@ export const api = {
   put:    (url, body)  => request(url, { method: 'PUT', body }),
   patch:  (url, body)  => request(url, { method: 'PATCH', body }),
   delete: (url)        => request(url, { method: 'DELETE' }),
+  uploadImage: async (file) => {
+    const res = await fetch(`${BASE}/reports/photos`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': file.type },
+      body: file,
+    });
+    const json = await res.json().catch(() => null);
+    if (!res.ok) {
+      const err = new Error(json?.error?.message || `Upload failed (${res.status})`);
+      err.status = res.status;
+      throw err;
+    }
+    return json;
+  },
 };
+

@@ -35,7 +35,9 @@
   transition: width var(--transition-slow);
 }
 
-.purple  { background: var(--color-purple); }
-.cyan    { background: var(--color-cyan); }
-.success { background: var(--color-success); }
-.yellow  { background: var(--color-yellow); }
+.purple  { background: linear-gradient(90deg, #2563EB, #3B82F6); }
+.primary { background: linear-gradient(90deg, #2563EB, #3B82F6); }
+.cyan    { background: linear-gradient(90deg, #0284C7, #38BDF8); }
+.success { background: linear-gradient(90deg, #059669, #10B981); }
+.yellow  { background: linear-gradient(90deg, #D97706, #F59E0B); }
+

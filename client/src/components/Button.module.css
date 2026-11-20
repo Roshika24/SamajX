@@ -1,21 +1,23 @@
-/* Button — pill shape, multiple variants */
+/* Modern Civic Button */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-lg);
   font-family: var(--font-body);
   font-weight: var(--weight-semibold);
   cursor: pointer;
-  border: 2px solid transparent;
-  transition: all var(--transition-base);
+  border: 1px solid transparent;
+  transition: all var(--transition-fast);
   position: relative;
   white-space: nowrap;
+  user-select: none;
+  line-height: var(--line-none);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
   transform: none !important;
   box-shadow: none !important;
@@ -23,52 +25,94 @@
 
 .btn:not(:disabled):hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
 }
 
 .btn:not(:disabled):active {
-  transform: scale(0.97);
+  transform: translateY(0);
 }
 
 /* Sizes */
-.sm { font-size: var(--text-sm); padding: var(--space-1) var(--space-4); }
-.md { font-size: var(--text-base); padding: var(--space-2) var(--space-6); }
-.lg { font-size: var(--text-lg); padding: var(--space-3) var(--space-8); }
+.sm {
+  font-size: var(--text-xs);
+  padding: 0.45rem 0.85rem;
+  border-radius: var(--radius-md);
+}
+
+.md {
+  font-size: var(--text-sm);
+  padding: 0.65rem 1.25rem;
+}
+
+.lg {
+  font-size: var(--text-base);
+  padding: 0.85rem 1.65rem;
+  border-radius: var(--radius-xl);
+}
 
 /* Variants */
 .primary {
-  background: var(--color-ink);
+  background: var(--color-primary);
   color: var(--color-white);
+  box-shadow: 0 1px 2px rgba(37, 99, 235, 0.2);
+}
+
+.primary:not(:disabled):hover {
+  background: var(--color-primary-hover);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
 }
 
 .secondary {
   background: var(--color-white);
-  color: var(--color-ink);
-  border-color: var(--color-gray-200);
+  color: var(--color-gray-700);
+  border-color: var(--color-gray-300);
+  box-shadow: var(--shadow-xs);
 }
 
 .secondary:not(:disabled):hover {
-  border-color: var(--color-purple);
-  color: var(--color-purple);
+  background: var(--color-gray-50);
+  border-color: var(--color-gray-400);
+  color: var(--color-gray-900);
 }
 
 .accent {
-  background: var(--color-cyan);
-  color: var(--color-ink);
+  background: var(--color-primary-bg);
+  color: var(--color-primary-hover);
+  border-color: var(--color-primary-border);
+}
+
+.accent:not(:disabled):hover {
+  background: var(--color-primary);
+  color: var(--color-white);
 }
 
 .ghost {
   background: transparent;
-  color: var(--color-ink);
+  color: var(--color-gray-600);
 }
 
 .ghost:not(:disabled):hover {
   background: var(--color-gray-100);
+  color: var(--color-gray-900);
+}
+
+.success {
+  background: var(--color-success);
+  color: var(--color-white);
+}
+
+.success:not(:disabled):hover {
+  background: var(--color-success-hover);
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.28);
 }
 
 .danger {
-  background: var(--color-error);
+  background: var(--color-danger);
   color: var(--color-white);
+}
+
+.danger:not(:disabled):hover {
+  background: var(--color-danger-hover);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.28);
 }
 
 /* Loading spinner */
@@ -77,8 +121,8 @@
 }
 
 .spinner {
-  width: 1em;
-  height: 1em;
+  width: 1.1em;
+  height: 1.1em;
   border: 2px solid currentColor;
   border-right-color: transparent;
   border-radius: 50%;
@@ -93,3 +137,4 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+

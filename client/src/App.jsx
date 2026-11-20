@@ -36,7 +36,40 @@ import CompanyDashboard from './pages/company/CompanyDashboard';
 import PlatformAdminDashboard from './pages/admin/PlatformAdminDashboard';
 
 function LoadingScreen() {
-  return <div role="status" aria-live="polite" style={{ display: 'grid', placeItems: 'center', minHeight: '60vh' }}><p>Loading SamajX…</p></div>;
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        display: 'grid',
+        placeItems: 'center',
+        minHeight: '70vh',
+        gap: 16,
+        textAlign: 'center',
+      }}
+    >
+      <div style={{ display: 'grid', gap: 12, placeItems: 'center' }}>
+        <div
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 'var(--radius-lg)',
+            backgroundColor: 'var(--color-primary-subtle)',
+            color: 'var(--color-primary)',
+            fontSize: 24,
+            display: 'grid',
+            placeItems: 'center',
+            animation: 'pulseGlow 2s ease-in-out infinite',
+          }}
+        >
+          🏛️
+        </div>
+        <p style={{ color: 'var(--color-ink-muted)', fontSize: 'var(--text-sm)', fontWeight: 500, margin: 0 }}>
+          Loading SamajX Platform…
+        </p>
+      </div>
+    </div>
+  );
 }
 
 function ProtectedRoute({ children, requiredRole }) {
@@ -52,11 +85,54 @@ export default function App() {
   if (loading) return <LoadingScreen />;
   if (sessionError) {
     return (
-      <main role="alert" style={{ display: 'grid', placeItems: 'center', minHeight: '60vh', padding: 24, textAlign: 'center' }}>
-        <div>
-          <h1>Unable to verify your session</h1>
-          <p>{sessionError}</p>
-          <button type="button" onClick={retrySession}>Try again</button>
+      <main
+        role="alert"
+        style={{
+          display: 'grid',
+          placeItems: 'center',
+          minHeight: '80vh',
+          padding: 24,
+          backgroundColor: 'var(--color-bg)',
+        }}
+      >
+        <div
+          style={{
+            maxWidth: 480,
+            padding: 32,
+            backgroundColor: 'var(--color-surface)',
+            borderRadius: 'var(--radius-xl)',
+            border: '1px solid var(--color-border)',
+            boxShadow: 'var(--shadow-lg)',
+            textAlign: 'center',
+            display: 'grid',
+            gap: 16,
+          }}
+        >
+          <div style={{ fontSize: 36 }}>⚠️</div>
+          <h1 style={{ fontSize: 'var(--text-xl)', fontWeight: 800, color: 'var(--color-ink)', margin: 0 }}>
+            Unable to verify session
+          </h1>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--color-ink-light)', margin: 0, lineHeight: 1.5 }}>
+            {sessionError}
+          </p>
+          <div style={{ paddingTop: 8 }}>
+            <button
+              type="button"
+              onClick={retrySession}
+              style={{
+                padding: '10px 20px',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--color-primary)',
+                color: '#ffffff',
+                fontWeight: 600,
+                fontSize: 'var(--text-sm)',
+                border: 'none',
+                cursor: 'pointer',
+              }}
+            >
+              Retry Connection
+            </button>
+          </div>
         </div>
       </main>
     );
@@ -93,13 +169,13 @@ export default function App() {
         </Route>
 
         <Route element={<ProtectedRoute requiredRole="university_admin"><UniversityLayout /></ProtectedRoute>}>
-  <Route path="/admin/university" element={<UniversityDashboard />} />
-  <Route path="/admin/university/teams" element={<UniversityTeamsPage />} />
-  <Route path="/admin/university/problems" element={<UniversityProblemsPage />} />
-  <Route path="/admin/university/applications" element={<UniversityProblemsPage />} />
-  <Route path="/admin/university/evidence" element={<FeaturePage eyebrow="UNIVERSITY · EVIDENCE" title="Evidence verification" description="Review and verify member credentials." nextStep="The current university dashboard already contains the Phase 2 evidence queue. This route is a dedicated view placeholder until that workflow is extracted into its own page." />} />
-  <Route path="/admin/university/completions" element={<UniversityCompletionPage />} />
-</Route>
+          <Route path="/admin/university" element={<UniversityDashboard />} />
+          <Route path="/admin/university/teams" element={<UniversityTeamsPage />} />
+          <Route path="/admin/university/problems" element={<UniversityProblemsPage />} />
+          <Route path="/admin/university/applications" element={<UniversityProblemsPage />} />
+          <Route path="/admin/university/evidence" element={<FeaturePage eyebrow="UNIVERSITY · EVIDENCE" title="Evidence verification" description="Review and verify member credentials." nextStep="The current university dashboard already contains the Phase 2 evidence queue. This route is a dedicated view placeholder until that workflow is extracted into its own page." />} />
+          <Route path="/admin/university/completions" element={<UniversityCompletionPage />} />
+        </Route>
 
         <Route element={<ProtectedRoute requiredRole="company"><CompanyLayout /></ProtectedRoute>}>
           <Route path="/company" element={<CompanyDashboard />} />
@@ -110,6 +186,7 @@ export default function App() {
         <Route element={<ProtectedRoute requiredRole="platform_admin"><PlatformAdminLayout /></ProtectedRoute>}>
           <Route path="/admin/platform" element={<PlatformAdminDashboard />} />
           <Route path="/admin/platform/universities" element={<PlatformAdminDashboard />} />
+          <Route path="/admin/platform/workflows" element={<Phase4AdminPage />} />
           <Route path="/admin/platform/phase4" element={<Phase4AdminPage />} />
         </Route>
 

@@ -21,12 +21,12 @@ export default function LocationPicker({ latitude, longitude, onChange }) {
     : null;
 
   return (
-    <div>
+    <div style={{ borderRadius: 12, overflow: 'hidden', border: '1px solid var(--color-gray-200)', background: 'var(--color-gray-50)' }}>
       <MapContainer
         center={selected || INDIA_CENTER}
         zoom={selected ? 13 : 4}
         scrollWheelZoom={false}
-        style={{ height: 240, width: '100%', borderRadius: 16, overflow: 'hidden' }}
+        style={{ height: 260, width: '100%' }}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -35,9 +35,14 @@ export default function LocationPicker({ latitude, longitude, onChange }) {
         <ClickToSelect onSelect={onChange} />
         {selected && <Marker position={selected} icon={CAMPUS_ICON} />}
       </MapContainer>
-      <p style={{ fontSize: 12, color: 'var(--color-ink-muted)', margin: '8px 0 0' }}>
-        Click the map at your university's campus to place its pin.
-      </p>
+      <div style={{ padding: '8px 12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'var(--color-white)', borderTop: '1px solid var(--color-gray-200)', fontSize: '0.8rem', color: 'var(--color-ink-muted)' }}>
+        <span>📍 Click anywhere on the map to set location</span>
+        {selected && (
+          <span style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+            {selected[0].toFixed(4)}, {selected[1].toFixed(4)}
+          </span>
+        )}
+      </div>
     </div>
   );
 }
