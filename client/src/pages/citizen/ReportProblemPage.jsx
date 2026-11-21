@@ -5,7 +5,20 @@ import Button from '../../components/Button';
 import LocationPicker from '../../components/LocationPicker';
 import { api } from '../../utils/api';
 
-const initial = { title: '', description: '', category: '', lat: '', lng: '', anonymous: false, photos: [] };
+const initial = {
+  title: '',
+  description: '',
+  category: '',
+  lat: '',
+  lng: '',
+  state: '',
+  district: '',
+  city: '',
+  locality: '',
+  address: '',
+  anonymous: false,
+  photos: []
+};
 
 export default function ReportProblemPage() {
   const [form, setForm] = useState(initial);
@@ -15,29 +28,112 @@ export default function ReportProblemPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const [locationLoading, setLocationLoading] = useState(false);
+
   const navigate = useNavigate();
 
-  useEffect(() => { api.get('/domains').then((r) => setDomains(r.data || [])).catch((e) => setError(e.message)); }, []);
+  useEffect(() => {
+    api.get('/domains')
+      .then((r) => setDomains(r.data || []))
+      .catch((e) => setError(e.message));
+  }, []);
+
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
 
+  async function detectLocation() {
+    if (!navigator.geolocation) {
+      setError('Geolocation is not supported by your browser.');
+      return;
+    }
+
+    setLocationLoading(true);
+    setError('');
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const lat = position.coords.latitude;
+          const lng = position.coords.longitude;
+
+          const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&addressdetails=1`
+          );
+
+          if (!response.ok) {
+            throw new Error('Unable to fetch address from reverse geocoder.');
+          }
+
+          const data = await response.json();
+          const address = data.address || {};
+
+          setForm((current) => ({
+            ...current,
+            lat: String(lat),
+            lng: String(lng),
+            state: address.state || '',
+            district: address.state_district || address.county || '',
+            city: address.city || address.town || address.village || '',
+            locality: address.suburb || address.neighbourhood || '',
+            address: data.display_name || ''
+          }));
+        } catch (err) {
+          setError(err.message);
+        } finally {
+          setLocationLoading(false);
+        }
+      },
+      () => {
+        setError('Location permission denied or location unavailable.');
+        setLocationLoading(false);
+      },
+      { enableHighAccuracy: true, timeout: 15000 }
+    );
+  }
+
   async function submit(event) {
-    event.preventDefault(); setError(''); setResult(null); setLoading(true);
+    event.preventDefault();
+    setError('');
+    setResult(null);
+    setLoading(true);
+
     try {
       const uploaded = [];
-      for (const file of photoFiles) { const upload = await api.uploadImage(file); uploaded.push(upload.data.url); }
-      const payload = { ...form, photos: [...form.photos, ...uploaded], lat: Number(form.lat), lng: Number(form.lng) };
+      for (const file of photoFiles) {
+        const upload = await api.uploadImage(file);
+        uploaded.push(upload.data.url);
+      }
+
+      const payload = {
+        ...form,
+        photos: [...form.photos, ...uploaded],
+        lat: form.lat !== '' && form.lat !== null && form.lat !== undefined ? Number(form.lat) : null,
+        lng: form.lng !== '' && form.lng !== null && form.lng !== undefined ? Number(form.lng) : null
+      };
+
       const response = await api.post('/reports', payload);
       setResult(response.data);
-      setForm(initial); setPhotoFiles([]);
-    } catch (e) { setError(e.message); }
-    finally { setLoading(false); }
+      setForm(initial);
+      setPhotoFiles([]);
+    } catch (e) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function addPhoto() {
     const value = photoUrl.trim();
-    if (!/^https:\/\//i.test(value)) { setError('Photo links must start with https://'); return; }
-    if (form.photos.length + photoFiles.length >= 5) { setError('You can add up to 5 photo links'); return; }
-    update('photos', [...form.photos, value]); setPhotoUrl(''); setError('');
+    if (!/^https:\/\//i.test(value)) {
+      setError('Photo links must start with https://');
+      return;
+    }
+    if (form.photos.length + photoFiles.length >= 5) {
+      setError('You can add up to 5 photo links in total');
+      return;
+    }
+    update('photos', [...form.photos, value]);
+    setPhotoUrl('');
+    setError('');
   }
 
   return (
@@ -46,7 +142,7 @@ export default function ReportProblemPage() {
         <p className="eyebrow">CITIZEN INITIATIVE · REPORT PROBLEM</p>
         <h1 style={{ fontSize: 'var(--text-3xl)', fontWeight: 800, margin: '0 0 var(--space-2) 0' }}>Report a Civic Issue</h1>
         <p style={{ color: 'var(--color-ink-muted)', margin: 0, fontSize: 'var(--text-sm)', lineHeight: 'var(--line-relaxed)' }}>
-          Pin the problem on the map, provide details, and submit evidence. Your report will be automatically triaged and routed to nearby university engineering teams.
+          Provide details, detect or enter your location, and submit photo evidence. Your report will be automatically triaged and routed to nearby university engineering teams.
         </p>
       </header>
 
@@ -153,13 +249,100 @@ export default function ReportProblemPage() {
             </div>
           </div>
 
-          {/* Section 2: Location */}
+          {/* Section 2: Location Details */}
           <div>
-            <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--weight-bold)', margin: '0 0 var(--space-2) 0', paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-gray-200)' }}>
-              2. Precise Location <span style={{ color: 'var(--color-danger)' }}>*</span>
-            </h3>
-            <p style={{ color: 'var(--color-ink-muted)', fontSize: 'var(--text-xs)', margin: '0 0 var(--space-3) 0' }}>
-              Click on the map to pinpoint the exact location of the civic problem.
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '0 0 var(--space-2) 0', paddingBottom: 'var(--space-2)', borderBottom: '1px solid var(--color-gray-200)' }}>
+              <h3 style={{ fontSize: 'var(--text-base)', fontWeight: 'var(--weight-bold)', margin: 0 }}>
+                2. Location Details
+              </h3>
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                disabled={locationLoading}
+                onClick={detectLocation}
+              >
+                {locationLoading ? '📡 Detecting Location…' : '📍 Detect Current GPS Location'}
+              </Button>
+            </div>
+            <p style={{ color: 'var(--color-ink-muted)', fontSize: 'var(--text-xs)', margin: '0 0 var(--space-4) 0' }}>
+              Detect your location automatically or fill in the administrative address below.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-4)', marginBottom: 'var(--space-4)' }}>
+              <div>
+                <label htmlFor="report-state" style={labelStyle}>
+                  State <span style={{ color: 'var(--color-danger)' }}>*</span>
+                </label>
+                <input
+                  id="report-state"
+                  required
+                  value={form.state}
+                  onChange={(e) => update('state', e.target.value)}
+                  placeholder="e.g. Delhi"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="report-district" style={labelStyle}>
+                  District <span style={{ color: 'var(--color-danger)' }}>*</span>
+                </label>
+                <input
+                  id="report-district"
+                  required
+                  value={form.district}
+                  onChange={(e) => update('district', e.target.value)}
+                  placeholder="e.g. North West Delhi"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="report-city" style={labelStyle}>
+                  City / Village <span style={{ color: 'var(--color-danger)' }}>*</span>
+                </label>
+                <input
+                  id="report-city"
+                  required
+                  value={form.city}
+                  onChange={(e) => update('city', e.target.value)}
+                  placeholder="e.g. New Delhi"
+                  style={inputStyle}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="report-locality" style={labelStyle}>
+                  Area / Locality
+                </label>
+                <input
+                  id="report-locality"
+                  value={form.locality}
+                  onChange={(e) => update('locality', e.target.value)}
+                  placeholder="e.g. Rohini Sector 16"
+                  style={inputStyle}
+                />
+              </div>
+            </div>
+
+            <div style={{ marginBottom: 'var(--space-4)' }}>
+              <label htmlFor="report-address" style={labelStyle}>
+                Full Address / Nearby Landmark <span style={{ color: 'var(--color-danger)' }}>*</span>
+              </label>
+              <textarea
+                id="report-address"
+                required
+                rows={2}
+                value={form.address}
+                onChange={(e) => update('address', e.target.value)}
+                placeholder="Street address, building number, opposite landmark…"
+                style={inputStyle}
+              />
+            </div>
+
+            <p style={{ color: 'var(--color-ink-muted)', fontSize: 'var(--text-xs)', margin: 'var(--space-4) 0 var(--space-2) 0', fontWeight: 'var(--weight-semibold)' }}>
+              Map Coordinates (Optional)
             </p>
 
             <LocationPicker
@@ -173,24 +356,22 @@ export default function ReportProblemPage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-3)', marginTop: 'var(--space-3)' }}>
               <div>
-                <label style={labelStyle}>Selected Latitude</label>
+                <label style={labelStyle}>Latitude (Optional)</label>
                 <input
                   aria-label="Latitude"
                   readOnly
-                  required
                   value={form.lat}
-                  placeholder="Click map to set"
+                  placeholder="Set via GPS detection or map click"
                   style={{ ...inputStyle, background: 'var(--color-gray-50)', color: 'var(--color-gray-700)' }}
                 />
               </div>
               <div>
-                <label style={labelStyle}>Selected Longitude</label>
+                <label style={labelStyle}>Longitude (Optional)</label>
                 <input
                   aria-label="Longitude"
                   readOnly
-                  required
                   value={form.lng}
-                  placeholder="Click map to set"
+                  placeholder="Set via GPS detection or map click"
                   style={{ ...inputStyle, background: 'var(--color-gray-50)', color: 'var(--color-gray-700)' }}
                 />
               </div>
@@ -237,7 +418,7 @@ export default function ReportProblemPage() {
               />
               <label htmlFor="file-upload" style={{ cursor: 'pointer', display: 'inline-block' }}>
                 <div style={{ color: 'var(--color-primary)', fontWeight: 'var(--weight-semibold)', fontSize: 'var(--text-sm)', marginBottom: 4 }}>
-                  📁 Click to select photos from device
+                  📸 Click to select photos from device
                 </div>
                 <div style={{ fontSize: 'var(--text-xs)', color: 'var(--color-gray-500)' }}>
                   PNG or JPEG up to 5MB each
@@ -304,7 +485,7 @@ export default function ReportProblemPage() {
               variant="primary"
               size="lg"
               loading={loading}
-              disabled={loading || !form.lat || !form.lng || !form.title || !form.category}
+              disabled={loading || !form.title || !form.category || !form.state || !form.district || !form.city || !form.address}
               style={{ width: '100%' }}
             >
               {loading ? 'Submitting Civic Report…' : 'Submit Civic Report'}
@@ -336,4 +517,3 @@ const inputStyle = {
   background: 'white',
   transition: 'border-color var(--transition-fast), box-shadow var(--transition-fast)'
 };
-
