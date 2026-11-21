@@ -98,12 +98,12 @@ async function createReport(userId, input) {
       if (['claimed', 'in_progress'].includes(best.status)) {
         await client.query(
           `INSERT INTO notifications (user_id, type, title, message, link)
-           SELECT l.user_id, 'new_duplicate_report', 'New report added to your problem',
+          SELECT l.user_id, 'new_duplicate_report', 'New report added to your problem',
                   'A citizen report was matched to a problem your team is working on.', $2
-           FROM projects pr
-           JOIN teams t ON t.id = pr.team_id
-           JOIN leaders l ON l.id = t.leader_id
-           WHERE pr.problem_id = $1 AND pr.status IN ('active', 'pending_approval')`,
+          FROM projects pr
+          JOIN teams t ON t.id = pr.team_id
+          JOIN leaders l ON l.id = t.leader_id
+          WHERE pr.problem_id = $1 AND pr.status IN ('active', 'pending_approval')`,
           [best.id, `/leader/problems/${best.id}`]
         );
       }
@@ -118,19 +118,45 @@ async function createReport(userId, input) {
     }
 
     const reportStatus = best && band === 'high' ? 'merged' : 'active';
-    const { rows: reportRows } = await client.query(
-      `INSERT INTO reports (user_id, problem_id, title, description, category, lat, lng, photos, anonymous, status, merge_confidence, ai_status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8::jsonb, $9, $10, $11, $12)
-       RETURNING id, problem_id, title, description, category, lat, lng, photos, anonymous, status, merge_confidence, created_at`,
-      [userId, reportProblemId, input.title, input.description, domain.slug, input.lat, input.lng,
-        JSON.stringify(input.photos || []), input.anonymous, reportStatus, best ? Number(best.score.toFixed(3)) : null,
-        band === 'medium' ? 'pending' : null]
-    );
+const { rows: reportRows } = await client.query(
+  `INSERT INTO reports (
+    user_id, problem_id, title, description, category,
+    lat, lng, state, district, city, locality, address,
+    photos, anonymous, status, merge_confidence, ai_status
+  )
+  VALUES (
+    $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+    $13::jsonb, $14, $15, $16, $17
+  )
+  RETURNING
+    id, problem_id, title, description, category,
+    lat, lng, state, district, city, locality, address,
+    photos, anonymous, status, merge_confidence, created_at`,
+  [
+    userId,
+    reportProblemId,
+    input.title,
+    input.description,
+    domain.slug,
+    input.lat,
+    input.lng,
+    input.state || null,
+    input.district || null,
+    input.city || null,
+    input.locality || null,
+    input.address || null,
+    JSON.stringify(input.photos || []),
+    input.anonymous,
+    reportStatus,
+    best ? Number(best.score.toFixed(3)) : null,
+    band === 'medium' ? 'pending' : null
+  ]
+);
     const report = reportRows[0];
     if (best && band === 'medium') {
       await client.query(
         `INSERT INTO report_merge_candidates (report_id, problem_id, confidence)
-         VALUES ($1, $2, $3)`, [report.id, best.id, best.score]
+        VALUES ($1, $2, $3)`, [report.id, best.id, best.score]
       );
     }
     await client.query('COMMIT');
@@ -213,7 +239,9 @@ async function listMine(userId, { page, limit }) {
   const offset = (page - 1) * limit;
   const [data, count] = await Promise.all([
     pool.query(
-      `SELECT r.id, r.title, r.description, r.category, r.lat, r.lng, r.photos,
+      `SELECT r.id, r.title, r.description, r.category,
+       r.lat, r.lng, r.state, r.district, r.city,
+       r.locality, r.address, r.photos,
               r.anonymous, r.status, r.merge_confidence, r.created_at, r.problem_id,
               p.status AS problem_status, p.title AS problem_title,
               c.problem_id AS duplicate_candidate_id, cp.title AS duplicate_candidate_title,

@@ -28,13 +28,33 @@ const reportSchema = z.object({
   title: z.string().trim().min(8).max(500),
   description: z.string().trim().min(20).max(5000),
   category: z.string().trim().min(2).max(50),
-  lat: z.number().finite().min(-90).max(90),
-  lng: z.number().finite().min(-180).max(180),
+
+  lat: z.number().finite().min(-90).max(90).nullable().optional(),
+lng: z.number().finite().min(-180).max(180).nullable().optional(),
+
+  state: z.string().trim().min(1).max(100),
+  district: z.string().trim().min(1).max(100),
+  city: z.string().trim().min(1).max(100),
+  locality: z.string().trim().max(200).default(''),
+  address: z.string().trim().min(1).max(500),
+
   photos: z.array(z.string().max(2000).refine((value) => {
     if (/^\/uploads\/[a-f0-9-]{36}\.(jpg|png)$/i.test(value)) return true;
     try { return new URL(value).protocol === 'https:'; } catch { return false; }
   }, 'Photo links must use HTTPS or a CivicPulse uploaded-photo URL')).max(config.uploads.maxPhotosPerReport).default([]),
+
   anonymous: z.boolean().default(false),
+}).superRefine((data, ctx) => {
+  const hasLat = data.lat != null;
+  const hasLng = data.lng != null;
+
+  if (hasLat !== hasLng) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Latitude and longitude must be provided together.',
+      path: ['lat']
+    });
+  }
 });
 
 
